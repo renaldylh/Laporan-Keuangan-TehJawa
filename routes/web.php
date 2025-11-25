@@ -21,13 +21,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('transactions', TransactionController::class);
     
-    Route::prefix('reports')->group(function () {
-        Route::get('/', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('create', [ReportController::class, 'create'])->name('reports.create');
-        Route::post('/', [ReportController::class, 'store'])->name('reports.store');
-        Route::get('{report}', [ReportController::class, 'show'])->name('reports.show');
-        Route::delete('{report}', [ReportController::class, 'destroy'])->name('reports.destroy');
-    });
+    Route::resource('reports', ReportController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
 
     Route::resource('menu', MenuController::class);
     Route::resource('orders', OrderController::class);
