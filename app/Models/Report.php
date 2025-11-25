@@ -20,6 +20,12 @@ class Report extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'report_date' => 'datetime',
+        'period_start' => 'date',
+        'period_end' => 'date',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

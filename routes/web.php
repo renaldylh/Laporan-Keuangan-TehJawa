@@ -21,7 +21,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('transactions', TransactionController::class);
     
-    Route::resource('reports', ReportController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+    Route::resource('reports', ReportController::class);
 
     Route::resource('menu', MenuController::class);
     Route::resource('orders', OrderController::class);

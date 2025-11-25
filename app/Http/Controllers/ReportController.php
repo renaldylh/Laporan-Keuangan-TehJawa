@@ -88,6 +88,31 @@ class ReportController extends Controller
         return view('reports.show', compact('report', 'transactions'));
     }
 
+    public function edit(Report $report)
+    {
+        if ($report->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('reports.edit', compact('report'));
+    }
+
+    public function update(Request $request, Report $report)
+    {
+        if ($report->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $validated = $request->validate([
+            'notes' => 'nullable|string',
+        ]);
+
+        $report->update($validated);
+
+        return redirect()->route('reports.show', $report)
+            ->with('success', 'Report updated successfully.');
+    }
+
     public function destroy(Report $report)
     {
         if ($report->user_id !== Auth::id()) {
