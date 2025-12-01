@@ -72,12 +72,16 @@
 
             <!-- Meta Information -->
             <div class="border-t border-teh-jawa-gold/10 pt-6 mb-6">
+                @if($menuItem->created_at)
                 <p class="text-xs text-teh-jawa-gray">
                     Ditambahkan: <span class="font-semibold">{{ $menuItem->created_at->format('d F Y H:i') }}</span>
                 </p>
+                @endif
+                @if($menuItem->updated_at)
                 <p class="text-xs text-teh-jawa-gray">
                     Terakhir diupdate: <span class="font-semibold">{{ $menuItem->updated_at->format('d F Y H:i') }}</span>
                 </p>
+                @endif
             </div>
 
             <!-- Actions -->

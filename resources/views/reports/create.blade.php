@@ -18,7 +18,7 @@
 
         <!-- Form Card with Clear Structure -->
         <div class="card-teh-luxury p-8 border-l-4 border-teh-jawa-gold">
-            <form method="POST" action="{{ route('reports.store') }}" class="space-y-8">
+            <form method="POST" action="{{ route('reports.generate') }}" class="space-y-8">
                 @csrf
                 
                 <!-- Step 1: Pilih Periode -->
@@ -71,80 +71,10 @@
 
                 <div class="border-t border-teh-jawa-gold/10"></div>
                 
-                <!-- Step 2: Jenis Laporan -->
+                <!-- Step 2: Catatan Tambahan -->
                 <div>
                     <div class="flex items-center gap-3 mb-5">
                         <div class="w-8 h-8 rounded-full bg-teh-jawa-gold text-white flex items-center justify-center font-bold text-sm">2</div>
-                        <label class="text-lg font-bold text-teh-jawa-black">Pilih Jenis Laporan</label>
-                    </div>
-                    <div class="space-y-3">
-                        <label class="relative">
-                            <input type="radio" name="report_type" value="summary" class="peer sr-only" {{ old('report_type', 'summary') == 'summary' ? 'checked' : '' }}>
-                            <div class="p-5 rounded-lg border-2 border-gray-200 cursor-pointer transition-all duration-200 peer-checked:border-teh-jawa-gold peer-checked:bg-teh-jawa-gold/5 peer-checked:shadow-lg hover:border-teh-jawa-gold/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="bg-teh-jawa-gold/20 p-3 rounded-lg flex-shrink-0">
-                                        <svg class="icon-lg text-teh-jawa-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-teh-jawa-black text-base">Ringkasan Laporan</p>
-                                        <p class="text-xs text-teh-jawa-gray">Ringkasan total pemasukan dan pengeluaran</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-                        
-                        <label class="relative">
-                            <input type="radio" name="report_type" value="detailed" class="peer sr-only" {{ old('report_type') == 'detailed' ? 'checked' : '' }}>
-                            <div class="p-5 rounded-lg border-2 border-gray-200 cursor-pointer transition-all duration-200 peer-checked:border-teh-jawa-green peer-checked:bg-teh-jawa-green/5 peer-checked:shadow-lg hover:border-teh-jawa-green/50">
-                                <div class="flex items-center gap-3">
-                                    <div class="bg-teh-jawa-green/20 p-3 rounded-lg flex-shrink-0">
-                                        <svg class="icon-lg text-teh-jawa-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-teh-jawa-green text-base">Transaksi Detail</p>
-                                        <p class="text-xs text-teh-jawa-gray">Daftar semua transaksi dengan rincian lengkap</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-                        
-                        <label class="relative">
-                            <input type="radio" name="report_type" value="category" class="peer sr-only" {{ old('report_type') == 'category' ? 'checked' : '' }}>
-                            <div class="p-5 rounded-lg border-2 border-gray-200 cursor-pointer transition-all duration-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:shadow-lg hover:border-red-300">
-                                <div class="flex items-center gap-3">
-                                    <div class="bg-red-100 p-3 rounded-lg flex-shrink-0">
-                                        <svg class="icon-lg text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v2.757a1 1 0 01-.808.983L13 9.935v5.028c0 .11-.09.2-.2.2h-1.6a.2.2 0 01-.2-.2v-5.028l-.192-.195A1 1 0 013 6.757V4z"></path>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <p class="font-bold text-red-600 text-base">Rincian Kategori</p>
-                                        <p class="text-xs text-teh-jawa-gray">Analisis berdasarkan kategori pemasukan/pengeluaran</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                    @error('report_type')
-                        <p class="text-red-500 text-sm mt-3 flex items-center gap-2">
-                            <svg class="icon-sm" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-                            </svg>
-                            {{ $message }}
-                        </p>
-                    @enderror
-                </div>
-
-                <div class="border-t border-teh-jawa-gold/10"></div>
-                
-                <!-- Step 3: Catatan Tambahan -->
-                <div>
-                    <div class="flex items-center gap-3 mb-5">
-                        <div class="w-8 h-8 rounded-full bg-teh-jawa-gold text-white flex items-center justify-center font-bold text-sm">3</div>
                         <label class="text-lg font-bold text-teh-jawa-black">Tambahkan Catatan (Opsional)</label>
                     </div>
                     <textarea name="notes" id="notes" rows="3"

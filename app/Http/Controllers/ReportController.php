@@ -6,7 +6,7 @@ use App\Models\Report;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
@@ -54,8 +54,8 @@ class ReportController extends Controller
             ])
             ->get();
 
-        $totalIncome = $transactions->where('category', 'income')->sum('amount');
-        $totalExpense = $transactions->where('category', 'expense')->sum('amount');
+        $totalIncome = $transactions->where('type', 'income')->sum('amount');
+        $totalExpense = $transactions->where('type', 'expense')->sum('amount');
         $profit = $totalIncome - $totalExpense;
 
         $report = Auth::user()->reports()->create([
@@ -79,13 +79,16 @@ class ReportController extends Controller
         }
         
         $transactions = Transaction::where('user_id', $report->user_id)
+            ->with('transactionDetails.menuItem')
             ->whereBetween('transaction_date', [
                 $report->period_start,
                 $report->period_end
             ])
             ->get();
-            
-        return view('reports.show', compact('report', 'transactions'));
+
+        $viewData = $this->buildReportData($report, $transactions);
+
+        return view('reports.show', $viewData);
     }
 
     public function edit(Report $report)
@@ -123,5 +126,93 @@ class ReportController extends Controller
         
         return redirect()->route('reports.index')
             ->with('success', 'Report deleted successfully.');
+    }
+
+    public function download(Report $report)
+    {
+        if ($report->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $transactions = Transaction::where('user_id', $report->user_id)
+            ->with('transactionDetails.menuItem')
+            ->whereBetween('transaction_date', [
+                $report->period_start,
+                $report->period_end
+            ])
+            ->get();
+
+        $viewData = $this->buildReportData($report, $transactions);
+
+        $pdf = Pdf::loadView('reports.pdf', $viewData)->setPaper('a4', 'portrait');
+
+        $fileName = 'laporan-tehjawa-' . $report->period_start->format('Ymd') . '-' . $report->period_end->format('Ymd') . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    private function buildReportData(Report $report, $transactions)
+    {
+        $totalIncome = $transactions->where('type', 'income')->sum('amount');
+        $totalExpense = $transactions->where('type', 'expense')->sum('amount');
+        $profit = $totalIncome - $totalExpense;
+
+        $incomeDetails = collect();
+        $incomeTransactions = $transactions->where('type', 'income');
+        foreach ($incomeTransactions as $transaction) {
+            foreach ($transaction->transactionDetails as $detail) {
+                $key = $detail->menu_name;
+                if (!$incomeDetails->has($key)) {
+                    $incomeDetails->put($key, [
+                        'menu_name' => $detail->menu_name,
+                        'quantity' => 0,
+                        'total_amount' => 0,
+                    ]);
+                }
+                $incomeDetails[$key]['quantity'] += $detail->quantity;
+                $incomeDetails[$key]['total_amount'] += $detail->total_price;
+            }
+        }
+
+        $incomeDetails = $incomeDetails->map(function ($detail) {
+            $detail['avg_price'] = $detail['quantity'] > 0 ? $detail['total_amount'] / $detail['quantity'] : 0;
+            return $detail;
+        });
+
+        $expenseDetails = collect();
+        $expenseTransactions = $transactions->where('type', 'expense');
+        foreach ($expenseTransactions as $transaction) {
+            foreach ($transaction->transactionDetails as $detail) {
+                $key = $detail->menu_name;
+                if (!$expenseDetails->has($key)) {
+                    $expenseDetails->put($key, [
+                        'category' => $detail->menu_name,
+                        'total_amount' => 0,
+                        'count' => 0,
+                    ]);
+                }
+                $expenseDetails[$key]['total_amount'] += $detail->total_price;
+                $expenseDetails[$key]['count']++;
+            }
+        }
+
+        $transactionCount = $transactions->count();
+        $incomeCount = $incomeTransactions->count();
+        $expenseCount = $expenseTransactions->count();
+        $avgTransactionValue = $incomeCount > 0 ? $totalIncome / $incomeCount : 0;
+
+        return [
+            'report' => $report,
+            'transactions' => $transactions,
+            'totalIncome' => $totalIncome,
+            'totalExpense' => $totalExpense,
+            'profit' => $profit,
+            'incomeDetails' => $incomeDetails,
+            'expenseDetails' => $expenseDetails,
+            'transactionCount' => $transactionCount,
+            'incomeCount' => $incomeCount,
+            'expenseCount' => $expenseCount,
+            'avgTransactionValue' => $avgTransactionValue,
+        ];
     }
 }

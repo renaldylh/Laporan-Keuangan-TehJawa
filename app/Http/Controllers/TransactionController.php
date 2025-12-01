@@ -10,16 +10,65 @@ class TransactionController extends Controller
 {
     public function index()
     {
-        $transactions = Auth::user()->transactions()
-            ->orderBy('transaction_date', 'desc')
-            ->paginate(10);
+        try {
+            // Get all transactions (both income and expense) for the authenticated user
+            $transactions = Auth::user()->transactions()
+                ->with('transactionDetails') // Eager load transaction details
+                ->orderBy('transaction_date', 'desc')
+                ->paginate(10);
+                
+            // Calculate total income and expense for the summary
+            $totalIncome = Auth::user()->transactions()
+                ->where('type', 'income')
+                ->sum('amount');
+                
+            $totalExpense = Auth::user()->transactions()
+                ->where('type', 'expense')
+                ->sum('amount');
+                
+            $balance = $totalIncome - $totalExpense;
+                
+            return view('transactions.index', compact('transactions', 'totalIncome', 'totalExpense', 'balance'));
             
-        return view('transactions.index', compact('transactions'));
+        } catch (\Exception $e) {
+            // Log the error
+            \Log::error('Error in TransactionController@index: ' . $e->getMessage());
+            
+            // Return a safe response with error message
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat memuat data transaksi. Silakan coba lagi.']);
+        }
     }
 
     public function create()
     {
-        return view('transactions.create');
+        $transactionTypes = [
+            'expense' => 'Pengeluaran',
+            'income_other' => 'Pemasukan Lain'
+        ];
+        
+        $expenseCategories = [
+            'Bayar Sampah',
+            'PDAM',
+            'Listrik',
+            'Sewa Ruko',
+            'Gaji Karyawan',
+            'Bahan Baku',
+            'Operasional',
+            'Marketing',
+            'Pajak',
+            'Lain-lain'
+        ];
+
+        $incomeCategories = [
+            'Catering',
+            'Delivery Fee',
+            'Service Charge',
+            'Deposit Customer',
+            'Sewa Tempat',
+            'Lainnya'
+        ];
+        
+        return view('transactions.create', compact('transactionTypes', 'expenseCategories', 'incomeCategories'));
     }
 
     public function store(Request $request)
@@ -28,19 +77,57 @@ class TransactionController extends Controller
             'transaction_date' => 'required|date',
             'amount' => 'required|numeric|min:0',
             'description' => 'required|string|max:255',
-            'category' => 'required|in:income,expense',
+            'type' => 'required|in:expense,income_other',
             'payment_method' => 'required|string|max:50',
+            'receipt' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:2048',
+            'details' => 'nullable|array',
+            'details.*.menu_name' => 'required|string|max:255',
+            'details.*.quantity' => 'required|integer|min:1',
+            'details.*.total_price' => 'required|numeric|min:0',
+            'details.*.notes' => 'nullable|string|max:500',
         ]);
 
-        Auth::user()->transactions()->create($validated);
+        // Convert income_other to income for database
+        if ($validated['type'] === 'income_other') {
+            $validated['type'] = 'income';
+        }
 
+        // Handle receipt upload
+        $receiptPath = null;
+        $receiptFilename = null;
+        if (isset($validated['receipt']) && $validated['receipt']) {
+            $receiptFile = $validated['receipt'];
+            $receiptFilename = time() . '_' . $receiptFile->getClientOriginalName();
+            $receiptPath = $receiptFile->storeAs('receipts', $receiptFilename, 'public');
+        }
+
+        $transaction = Auth::user()->transactions()->create([
+            'transaction_date' => $validated['transaction_date'],
+            'amount' => $validated['amount'],
+            'description' => $validated['description'],
+            'type' => $validated['type'],
+            'payment_method' => $validated['payment_method'],
+            'receipt_path' => $receiptPath,
+            'receipt_filename' => $receiptFilename,
+        ]);
+
+        // Simpan transaction details jika ada
+        if (isset($validated['details']) && is_array($validated['details'])) {
+            foreach ($validated['details'] as $detail) {
+                $transaction->transactionDetails()->create($detail);
+            }
+        }
+
+        $message = $validated['type'] === 'income' ? 'Pemasukan berhasil dicatat.' : 'Pengeluaran berhasil dicatat.';
+        
         return redirect()->route('transactions.index')
-            ->with('success', 'Transaction added successfully.');
+            ->with('success', $message);
     }
 
     public function show(Transaction $transaction)
     {
         $this->authorize('view', $transaction);
+        $transaction->load('transactionDetails.menuItem');
         return view('transactions.show', compact('transaction'));
     }
 
@@ -58,7 +145,7 @@ class TransactionController extends Controller
             'transaction_date' => 'required|date',
             'amount' => 'required|numeric|min:0',
             'description' => 'required|string|max:255',
-            'category' => 'required|in:income,expense',
+            'type' => 'required|in:income,expense',
             'payment_method' => 'required|string|max:50',
         ]);
 

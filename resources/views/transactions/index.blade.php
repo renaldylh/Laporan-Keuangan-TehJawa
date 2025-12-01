@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-teh-jawa-cream via-white to-teh-jawa-gold-accent/20">
+<div class="min-h-screen bg-teh-jawa-cream">
     <div class="container mx-auto px-4 py-6 md:py-8 max-w-5xl">
         
         <!-- Header Section -->
         <div class="mb-8 section-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-teh-jawa-gold to-teh-jawa-brown bg-clip-text text-transparent">
+                <h1 class="text-3xl md:text-4xl font-bold text-teh-jawa-brown">
                     Daftar Transaksi
                 </h1>
                 <p class="text-xs md:text-sm text-teh-jawa-gray mt-1">Kelola semua transaksi keuangan Anda</p>
@@ -26,6 +26,16 @@
                 {{ session('success') }}
             </div>
         @endif
+        
+        <!-- Income Transaction Success Alert -->
+        <div id="incomeSuccessAlert" class="hidden alert-teh-success mb-6">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <span>✅ Data transaksi pemasukan berhasil ditambahkan ke tabel!</span>
+            </div>
+        </div>
 
         <!-- Transactions Table -->
         <div class="card-teh-luxury border-teh-jawa-gold/20">
@@ -45,21 +55,41 @@
                         @forelse($transactions as $transaction)
                         <tr>
                             <td class="text-xs md:text-sm text-teh-jawa-gray">
-                                {{ \Carbon\Carbon::parse($transaction->transaction_date)->format('d M Y') }}
+                                @php
+                                    try {
+                                        $date = is_string($transaction->transaction_date) 
+                                            ? \Carbon\Carbon::parse($transaction->transaction_date)
+                                            : $transaction->transaction_date;
+                                        echo $date->format('d M Y');
+                                    } catch (\Exception $e) {
+                                        echo 'Tanggal tidak valid';
+                                    }
+                                @endphp
                             </td>
                             <td class="text-xs md:text-sm">
                                 <div class="font-semibold text-teh-jawa-black">{{ $transaction->description }}</div>
                                 @if($transaction->payment_method)
                                     <div class="text-xs text-teh-jawa-gray mt-0.5">{{ $transaction->payment_method }}</div>
                                 @endif
+                                @if($transaction->receipt_path)
+                                    <div class="text-xs text-teh-jawa-gray mt-0.5">
+                                        <a href="{{ asset('storage/' . $transaction->receipt_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 underline">
+                                            <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                            Lihat Bukti
+                                        </a>
+                                    </div>
+                                @endif
                             </td>
                             <td class="text-xs md:text-sm">
-                                <span class="inline-block px-2 md:px-3 py-1 rounded-lg text-xs font-semibold {{ $transaction->category == 'income' ? 'bg-teh-jawa-green/10 text-teh-jawa-green' : 'bg-red-100 text-red-700' }}">
-                                    {{ $transaction->category == 'income' ? 'Pemasukan' : 'Pengeluaran' }}
+                                <span class="inline-block px-2 md:px-3 py-1 rounded-lg text-xs font-semibold {{ $transaction->type == 'income' ? 'bg-teh-jawa-gold/20 text-teh-jawa-brown' : 'bg-red-100 text-red-700' }}">
+                                    {{ $transaction->type == 'income' ? 'Pemasukan' : 'Pengeluaran' }}
                                 </span>
                             </td>
-                            <td class="text-right text-xs md:text-sm font-semibold {{ $transaction->category == 'income' ? 'text-teh-jawa-green' : 'text-red-600' }}">
-                                {{ $transaction->category == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0) }}
+                            <td class="text-right text-xs md:text-sm font-semibold {{ $transaction->type == 'income' ? 'text-teh-jawa-brown' : 'text-red-600' }}">
+                                {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0) }}
                             </td>
                             <td class="text-right">
                                 <div class="flex gap-2 justify-end">
@@ -106,4 +136,45 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+// Check if user came from sales page (income transaction)
+document.addEventListener('DOMContentLoaded', function() {
+    // Show success alert if coming from sales
+    if (document.referrer && document.referrer.includes('/sales')) {
+        const incomeAlert = document.getElementById('incomeSuccessAlert');
+        if (incomeAlert) {
+            incomeAlert.classList.remove('hidden');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                incomeAlert.classList.add('hidden');
+            }, 5000);
+        }
+    }
+    
+    // Check for income transactions and highlight them
+    const incomeRows = document.querySelectorAll('tr');
+    incomeRows.forEach(row => {
+        const typeCell = row.querySelector('td:nth-child(3)'); // Category column
+        if (typeCell && typeCell.textContent.includes('Pemasukan')) {
+            // Add highlight animation for new income transactions
+            row.style.animation = 'highlightGold 2s ease-in-out';
+        }
+    });
+});
+
+// Add CSS animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes highlightGold {
+        0% { background-color: rgba(251, 191, 36, 0.15); }
+        50% { background-color: rgba(251, 191, 36, 0.25); }
+        100% { background-color: transparent; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+@endpush
 @endsection

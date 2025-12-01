@@ -36,9 +36,9 @@
         @if($menuItems->count() > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             @foreach($menuItems as $item)
-            <div class="card-teh-luxury hover:shadow-lg transition-all hover:-translate-y-1">
+            <div class="card-teh-luxury hover:shadow-lg transition-all hover:-translate-y-1 relative">
                 <!-- Status Badge -->
-                <div class="absolute top-4 right-4 flex gap-2">
+                <div class="absolute top-4 right-4 flex gap-2 pointer-events-none">
                     @if(!$item->is_available)
                     <span class="badge-teh bg-red-100 text-red-800">Tidak Tersedia</span>
                     @endif

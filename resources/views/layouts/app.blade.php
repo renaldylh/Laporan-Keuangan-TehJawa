@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toko Teh Jawa - Financial Reporting</title>
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
 </head>
 <body>
     @include('layouts.navigation')
@@ -18,5 +21,7 @@
         
         @yield('content')
     </main>
+
+    @stack('scripts')
 </body>
 </html>

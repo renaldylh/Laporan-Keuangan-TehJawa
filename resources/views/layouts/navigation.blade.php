@@ -19,11 +19,17 @@
                         </svg>
                         Dashboard
                     </a>
+                    <a href="{{ route('sales.index') }}" class="nav-teh-link {{ request()->routeIs('sales.*') ? 'nav-teh-link-active' : '' }}">
+                        <svg class="icon-teh-small mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        </svg>
+                        POS / Penjualan
+                    </a>
                     <a href="{{ route('transactions.index') }}" class="nav-teh-link {{ request()->routeIs('transactions.*') ? 'nav-teh-link-active' : '' }}">
                         <svg class="icon-teh-small mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
                         </svg>
-                        Transaksi
+                        Transaksi Lain
                     </a>
                     <a href="{{ route('reports.index') }}" class="nav-teh-link {{ request()->routeIs('reports.*') ? 'nav-teh-link-active' : '' }}">
                         <svg class="icon-teh-small mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,6 +96,15 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('sales.index')" :active="request()->routeIs('sales.*')">
+                POS / Penjualan
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.*')">
+                Transaksi Lain
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                {{ __('Laporan') }}
             </x-responsive-nav-link>
         </div>
 

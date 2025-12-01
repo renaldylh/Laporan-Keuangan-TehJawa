@@ -14,12 +14,24 @@ class Transaction extends Model
         'transaction_date',
         'amount',
         'description',
-        'category', // 'income' or 'expense'
+        'type', // 'income' or 'expense'
         'payment_method',
+        'receipt_path',
+        'receipt_filename',
+    ];
+
+    protected $casts = [
+        'transaction_date' => 'datetime',
+        'amount' => 'decimal:2',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function transactionDetails()
+    {
+        return $this->hasMany(TransactionDetail::class);
     }
 }

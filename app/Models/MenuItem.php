@@ -55,9 +55,6 @@ class MenuItem extends Model
         return $labels[$this->category] ?? $this->category;
     }
 
-    /**
-     * Format price in Indonesian Rupiah
-     */
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . number_format($this->price, 0, ',', '.');
@@ -73,5 +70,17 @@ class MenuItem extends Model
         }
 
         return $this->is_available && $this->stock > 0;
+    }
+
+    /**
+     * Get the image URL for the menu item
+     */
+    public function getImageUrlAttribute()
+    {
+        if ($this->image) {
+            return asset('storage/menu_images/' . $this->image);
+        }
+        
+        return null;
     }
 }
