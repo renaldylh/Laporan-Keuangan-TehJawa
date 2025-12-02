@@ -61,7 +61,7 @@
                     Debug: Menu Items Count: {{ $menuItems->count() }}, Categories: {{ $categories->count() }}
                 </div>
                 
-                <div id="menuGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; padding: 1rem;">
+                <div id="menuGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                     @if($menuItems->count() > 0)
                         @foreach($menuItems as $menuItem)
                         <div class="menu-item-card group cursor-pointer" 
@@ -97,13 +97,55 @@
                                     @endif
                                     <div class="text-sm font-bold text-gray-900 mb-2">Rp {{ number_format($menuItem->price, 0) }}</div>
                                     
-                                    <!-- Simple Add Button -->
-                                    <button class="add-to-cart-btn w-full px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                        </svg>
-                                        <span class="text-sm font-medium">Add to Cart</span>
-                                    </button>
+                                    <!-- Quantity Selector & Add Button -->
+                                    <div class="quantity-selector-container">
+                                        <!-- Quick Add Buttons -->
+                                        <div class="quick-add-buttons flex gap-1 mb-2">
+                                            <button class="quick-add-btn flex-1 px-2 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-700 rounded transition-colors" 
+                                                    data-quantity="1">
+                                                1
+                                            </button>
+                                            <button class="quick-add-btn flex-1 px-2 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-700 rounded transition-colors" 
+                                                    data-quantity="2">
+                                                2
+                                            </button>
+                                            <button class="quick-add-btn flex-1 px-2 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-700 rounded transition-colors" 
+                                                    data-quantity="3">
+                                                3
+                                            </button>
+                                            <button class="quick-add-btn flex-1 px-2 py-1 text-xs bg-gray-100 hover:bg-blue-100 hover:text-blue-700 rounded transition-colors" 
+                                                    data-quantity="5">
+                                                5
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Custom Quantity Input + Add Button -->
+                                        <div class="flex gap-1">
+                                            <div class="flex-1 flex items-center bg-gray-50 rounded-lg border border-gray-200">
+                                                <button class="quantity-decrease px-2 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-l-lg transition-colors">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                                    </svg>
+                                                </button>
+                                                <input type="number" 
+                                                       class="quantity-input flex-1 w-8 text-center text-xs font-medium bg-transparent border-0 focus:ring-0" 
+                                                       value="1" 
+                                                       min="1" 
+                                                       max="99">
+                                                <button class="quantity-increase px-2 py-1 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded-r-lg transition-colors">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <button class="add-to-cart-btn px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                <span class="text-xs font-medium">Add</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -362,54 +404,7 @@ button:disabled {
     opacity: 0.5;
 }
 
-/* Fixed Grid Layout */
-#menuGrid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 1rem !important;
-    padding: 1rem !important;
-}
-
-@media (max-width: 1024px) {
-    #menuGrid {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 768px) {
-    #menuGrid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    #menuGrid {
-        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-    }
-}
-
-.menu-item-card {
-    width: 100% !important;
-    max-width: 100% !important;
-}
-
-/* Remove quantity selector styles */
-.quantity-selector-container,
-.quick-add-buttons,
-.quantity-decrease,
-.quantity-increase,
-.quantity-input {
-    display: none !important;
-}
-
-/* Simple add button styling */
-.add-to-cart-btn {
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-}
+/* Responsive Grid */
 @media (max-width: 640px) {
     .grid-cols-2 {
         grid-template-columns: repeat(1, 1fr);
