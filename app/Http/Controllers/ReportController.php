@@ -169,8 +169,11 @@ class ReportController extends Controller
                         'total_amount' => 0,
                     ]);
                 }
-                $incomeDetails[$key]['quantity'] += $detail->quantity;
-                $incomeDetails[$key]['total_amount'] += $detail->total_price;
+                // Convert to array first to avoid indirect modification error
+                $currentDetail = $incomeDetails->get($key);
+                $currentDetail['quantity'] += $detail->quantity;
+                $currentDetail['total_amount'] += $detail->total_price;
+                $incomeDetails->put($key, $currentDetail);
             }
         }
 
@@ -191,8 +194,11 @@ class ReportController extends Controller
                         'count' => 0,
                     ]);
                 }
-                $expenseDetails[$key]['total_amount'] += $detail->total_price;
-                $expenseDetails[$key]['count']++;
+                // Convert to array first to avoid indirect modification error
+                $currentExpense = $expenseDetails->get($key);
+                $currentExpense['total_amount'] += $detail->total_price;
+                $currentExpense['count']++;
+                $expenseDetails->put($key, $currentExpense);
             }
         }
 

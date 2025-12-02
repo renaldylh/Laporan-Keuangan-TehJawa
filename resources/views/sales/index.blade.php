@@ -61,7 +61,7 @@
                     Debug: Menu Items Count: {{ $menuItems->count() }}, Categories: {{ $categories->count() }}
                 </div>
                 
-                <div id="menuGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                <div id="menuGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; padding: 1rem;">
                     @if($menuItems->count() > 0)
                         @foreach($menuItems as $menuItem)
                         <div class="menu-item-card group cursor-pointer" 
@@ -404,7 +404,36 @@ button:disabled {
     opacity: 0.5;
 }
 
-/* Responsive Grid */
+/* Fixed Grid Layout */
+#menuGrid {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+}
+
+@media (max-width: 1024px) {
+    #menuGrid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #menuGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #menuGrid {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+}
+
+.menu-item-card {
+    width: 100% !important;
+    max-width: 100% !important;
+}
 @media (max-width: 640px) {
     .grid-cols-2 {
         grid-template-columns: repeat(1, 1fr);
