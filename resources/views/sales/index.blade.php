@@ -422,9 +422,25 @@ button:disabled {
     margin-top: auto !important;
 }
 
-/* Hide quick add buttons */
-.quick-add-buttons {
+/* Force hide all toggle elements */
+.quantity-selector-container,
+.quick-add-buttons,
+.quick-add-btn,
+[data-quantity="1"],
+[data-quantity="2"],
+[data-quantity="3"],
+[data-quantity="5"] {
     display: none !important;
+    visibility: hidden !important;
+}
+
+/* Only show simple quantity controls */
+.quantity-decrease,
+.quantity-input,
+.quantity-increase,
+.add-to-cart-btn {
+    display: flex !important;
+    visibility: visible !important;
 }
 @media (max-width: 640px) {
     .grid-cols-2 {
