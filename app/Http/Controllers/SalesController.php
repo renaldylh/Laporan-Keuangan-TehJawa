@@ -4,38 +4,39 @@ namespace App\Http\Controllers;
 
 use App\Models\MenuItem;
 use App\Models\Transaction;
+use App\Models\TransactionDetail;
+use App\Constants\MenuCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 
 class SalesController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     /**
-     * Display sales dashboard/POS
+     * Display the POS sales page with menu items
      */
     public function index()
     {
-        $menuItems = MenuItem::where('is_available', true)
+        // Optimize: Only select necessary columns
+        $menuItems = MenuItem::select('id', 'name', 'price', 'category', 'description', 'stock', 'image', 'is_available')
             ->orderBy('category')
             ->orderBy('name')
             ->get();
 
-        // Get categories for tabs
-        $categories = $menuItems->pluck('category')->unique()->sort();
+        $categories = $menuItems->pluck('category')->unique()->filter()->values();
+        $categoryLabels = MenuCategory::all();
+        $uncategorizedCount = $menuItems->whereNull('category')->count();
+        $placeholderImage = asset('images/menu-placeholder.svg');
 
-        $todaySales = Auth::user()->transactions()
-            ->where('type', 'income')
-            ->whereDate('transaction_date', today())
-            ->with('transactionDetails.menuItem')
-            ->get();
-
-        return view('sales.index', compact('menuItems', 'categories', 'todaySales'));
+        return view('sales.index', compact(
+            'menuItems',
+            'categories',
+            'categoryLabels',
+            'uncategorizedCount',
+            'placeholderImage'
+        ));
     }
 
     /**
@@ -98,10 +99,10 @@ class SalesController extends Controller
                     throw new \Exception("Menu item dengan ID {$item['menu_item_id']} tidak ditemukan");
                 }
                 
-                // Skip stock check for now to avoid errors
-                // if (!$menuItem->isInStock()) {
-                //     throw new \Exception("Stok {$menuItem->name} tidak mencukupi");
-                // }
+                // Check stock availability
+                if (!$menuItem->isInStock()) {
+                    throw new \Exception("Stok {$menuItem->name} tidak mencukupi");
+                }
 
                 $quantity = (int)$item['quantity'];
                 $unitPrice = (float)$menuItem->price;
@@ -120,10 +121,10 @@ class SalesController extends Controller
                     'updated_at' => now()
                 ];
 
-                // Skip stock update for now
-                // if ($menuItem->stock > 0) {
-                //     $menuItem->decrement('stock', $quantity);
-                // }
+                // Update stock if not unlimited
+                if ($menuItem->stock != -1) {
+                    $menuItem->decrement('stock', $quantity);
+                }
             }
 
             if ($totalAmount <= 0) {
@@ -131,7 +132,7 @@ class SalesController extends Controller
             }
 
             // Buat deskripsi transaksi
-            $description = 'Penjualan Menu';
+            $description = 'Transaksi Lain - Penjualan Menu';
             if (!empty($validated['notes'])) {
                 $description .= ' - ' . $validated['notes'];
             }
@@ -146,12 +147,12 @@ class SalesController extends Controller
                 $receiptPath = $receiptFile->storeAs('receipts', $receiptFilename, 'public');
             }
 
-            // Simpan transaksi PEMASUKAN
+            // Simpan transaksi sebagai TRANSAKSI LAIN (Pemasukan Lain)
             $transaction = Auth::user()->transactions()->create([
                 'transaction_date' => $validated['transaction_date'],
                 'amount' => $totalAmount,
                 'description' => $description,
-                'type' => 'income', // PASTIKAN INCOME
+                'type' => 'income_other', // Transaksi Lain - Pemasukan
                 'payment_method' => $validated['payment_method'],
                 'receipt_path' => $receiptPath,
                 'receipt_filename' => $receiptFilename,
@@ -181,10 +182,10 @@ class SalesController extends Controller
             if ($request->expectsJson()) {
                 return response()->json([
                     'success' => true,
-                    'message' => "Transaksi pemasukan berhasil disimpan!",
+                    'message' => "Transaksi lain berhasil disimpan ke pemasukan!",
                     'transaction_id' => $transaction->id,
                     'total_amount' => $totalAmount,
-                    'type' => 'income',
+                    'type' => 'income_other',
                     'description' => $description,
                     'transaction_date' => $transaction->transaction_date,
                     'payment_method' => $transaction->payment_method
@@ -234,8 +235,8 @@ class SalesController extends Controller
         $transaction = Auth::user()->transactions()->create([
             'transaction_date' => now(),
             'amount' => $totalPrice,
-            'description' => "Quick Sale: {$menuItem->name} ({$validated['quantity']}x)",
-            'type' => 'income',
+            'description' => "Transaksi Lain - Quick Sale: {$menuItem->name} ({$validated['quantity']}x)",
+            'type' => 'income_other',
             'payment_method' => $validated['payment_method'],
         ]);
 

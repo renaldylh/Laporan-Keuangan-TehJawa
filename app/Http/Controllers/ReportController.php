@@ -23,6 +23,7 @@ class ReportController extends Controller
     public function index()
     {
         $reports = Auth::user()->reports()
+            ->select('id', 'report_date', 'period_start', 'period_end', 'total_income', 'total_expense', 'profit')
             ->orderBy('report_date', 'desc')
             ->paginate(10);
             
@@ -47,15 +48,20 @@ class ReportController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        $transactions = Auth::user()->transactions()
+        // Optimized query dengan selectRaw untuk aggregation
+        $summary = Auth::user()->transactions()
+            ->selectRaw('
+                SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as total_income,
+                SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as total_expense
+            ')
             ->whereBetween('transaction_date', [
                 $validated['period_start'],
                 $validated['period_end']
             ])
-            ->get();
+            ->first();
 
-        $totalIncome = $transactions->where('type', 'income')->sum('amount');
-        $totalExpense = $transactions->where('type', 'expense')->sum('amount');
+        $totalIncome = $summary->total_income ?? 0;
+        $totalExpense = $summary->total_expense ?? 0;
         $profit = $totalIncome - $totalExpense;
 
         $report = Auth::user()->reports()->create([
@@ -78,8 +84,12 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
         
+        // Optimized query dengan select minimal columns
         $transactions = Transaction::where('user_id', $report->user_id)
-            ->with('transactionDetails.menuItem')
+            ->select('id', 'transaction_date', 'amount', 'description', 'type', 'payment_method')
+            ->with(['transactionDetails' => function($query) {
+                $query->select('transaction_id', 'menu_name', 'quantity', 'total_price');
+            }])
             ->whereBetween('transaction_date', [
                 $report->period_start,
                 $report->period_end
@@ -134,8 +144,12 @@ class ReportController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+        // Optimized query dengan select minimal columns
         $transactions = Transaction::where('user_id', $report->user_id)
-            ->with('transactionDetails.menuItem')
+            ->select('id', 'transaction_date', 'amount', 'description', 'type', 'payment_method')
+            ->with(['transactionDetails' => function($query) {
+                $query->select('transaction_id', 'menu_name', 'quantity', 'total_price');
+            }])
             ->whereBetween('transaction_date', [
                 $report->period_start,
                 $report->period_end

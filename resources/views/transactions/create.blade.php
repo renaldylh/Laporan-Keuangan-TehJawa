@@ -200,7 +200,6 @@
                                             @foreach($incomeCategories as $category)
                                                 <option value="{{ $category }}">{{ $category }}</option>
                                             @endforeach
-                                            <option value="Lainnya">Lainnya</option>
                                         </select>
                                     </div>
                                     <div>
@@ -241,7 +240,6 @@
                                             @foreach($expenseCategories as $category)
                                                 <option value="{{ $category }}">{{ $category }}</option>
                                             @endforeach
-                                            <option value="Lainnya">Lainnya</option>
                                         </select>
                                     </div>
                                     <div>
@@ -374,7 +372,6 @@ document.addEventListener('DOMContentLoaded', function() {
         incomeCategories.forEach(category => {
             options += `<option value="${category}">${category}</option>`;
         });
-        options += '<option value="Lainnya">Lainnya</option>';
         
         return `
             <div class="income-item-row border border-gray-200 rounded-lg p-4">
@@ -418,7 +415,6 @@ document.addEventListener('DOMContentLoaded', function() {
         expenseCategories.forEach(category => {
             options += `<option value="${category}">${category}</option>`;
         });
-        options += '<option value="Lainnya">Lainnya</option>';
         
         return `
             <div class="expense-item-row border border-gray-200 rounded-lg p-4">

@@ -19,6 +19,7 @@ class MenuItem extends Model
         'is_available',
         'stock',
         'image',
+        'image_url',
     ];
 
     protected $casts = [
@@ -81,6 +82,38 @@ class MenuItem extends Model
             return asset('storage/menu_images/' . $this->image);
         }
         
+        if ($this->image_url) {
+            return $this->image_url;
+        }
+        
+        return asset('images/menu-placeholder.svg');
+    }
+    
+    /**
+     * Handle image upload
+     */
+    public function uploadImage($imageFile)
+    {
+        if ($imageFile && $imageFile->isValid()) {
+            $filename = time() . '_' . $imageFile->getClientOriginalName();
+            $path = $imageFile->storeAs('menu_images', $filename, 'public');
+            $this->update(['image' => $filename]);
+            return $path;
+        }
         return null;
+    }
+    
+    /**
+     * Delete associated image
+     */
+    public function deleteImage()
+    {
+        if ($this->image) {
+            $imagePath = storage_path('app/public/menu_images/' . $this->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            $this->update(['image' => null]);
+        }
     }
 }

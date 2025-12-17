@@ -1,1191 +1,1429 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50">
-    <!-- Top Navigation Bar -->
-    <div class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div class="px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <h1 class="text-2xl font-bold text-gray-900">TehJawa POS</h1>
-                    <span class="ml-3 px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Online</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="text-sm text-gray-600">
-                        {{ now()->format('l, d F Y') }}
-                    </div>
-                    <div class="text-sm font-medium text-gray-900">
-                        {{ now()->format('H:i') }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Layout -->
-    <div class="flex flex-col lg:flex-row h-[calc(100vh-4rem)]">
-        
-        <!-- Left: Products Section -->
-        <div class="flex-1 flex flex-col bg-white border-r border-gray-200">
-            
-            <!-- Category Navigation -->
-            <div class="px-6 py-4 border-b border-gray-200">
-                <div class="flex items-center justify-between">
-                    <h2 class="text-lg font-semibold text-gray-900">Menu Produk</h2>
-                    <div class="flex items-center space-x-2">
-                        <button class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Category Tabs -->
-                <div class="flex space-x-1 mt-4 overflow-x-auto">
-                    <button class="category-tab active px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg whitespace-nowrap" data-category="all">
-                        Semua
-                    </button>
-                    @foreach($categories as $category)
-                        <button class="category-tab px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors whitespace-nowrap" data-category="{{ $category }}">
-                            {{ ucfirst($category) }}
-                        </button>
-                    @endforeach
-                </div>
-            </div>
-            
-            <!-- Products Grid -->
-            <div class="flex-1 overflow-y-auto p-6">
-                <!-- Debug Info -->
-                <div class="mb-4 p-2 bg-gray-100 rounded text-xs">
-                    Debug: Menu Items Count: {{ $menuItems->count() }}, Categories: {{ $categories->count() }}
-                </div>
-                
-                <div id="menuGrid" class="grid grid-cols-4 gap-4 p-4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; padding: 1rem;">
-                    @if($menuItems->count() > 0)
-                        @foreach($menuItems as $menuItem)
-                        <div class="menu-item-card group cursor-pointer" 
-                             data-menu-id="{{ $menuItem->id }}" 
-                             data-menu-name="{{ $menuItem->name }}" 
-                             data-menu-price="{{ $menuItem->price }}"
-                             data-category="{{ $menuItem->category }}">
-                            
-                            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-blue-300 hover:shadow-md transition-all duration-200">
-                                <!-- Product Image -->
-                                <div class="aspect-square bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center relative">
-                                    @php
-                                        $imageUrl = $menuItem->image_url ?: asset('images/menu-placeholder.svg');
-                                    @endphp
-                                    <img src="{{ $imageUrl }}"
-                                         alt="{{ $menuItem->name }}"
-                                         class="w-full h-full object-cover"
-                                         onerror="this.onerror=null;this.src='{{ asset('images/menu-placeholder.svg') }}';">
-                                    @if($menuItem->stock > 0 && $menuItem->stock <= 5)
-                                        <span class="absolute top-2 right-2 px-2 py-1 text-xs font-medium bg-orange-500 text-white rounded-full">
-                                            {{ $menuItem->stock }}
-                                        </span>
-                                    @endif
-                                </div>
-                                
-                                <!-- Product Info -->
-                                <div class="p-3">
-                                    <h4 class="font-medium text-sm text-gray-900 line-clamp-2 leading-tight mb-1">
-                                        {{ $menuItem->name }}
-                                    </h4>
-                                    @if($menuItem->category)
-                                        <p class="text-xs text-gray-500 mb-2">{{ ucfirst($menuItem->category) }}</p>
-                                    @endif
-                                    <div class="text-sm font-bold text-gray-900 mb-2">Rp {{ number_format($menuItem->price, 0) }}</div>
-                                    
-                                    <!-- Simple Quantity Controls -->
-                                    <div class="flex items-center gap-1">
-                                        <button class="quantity-decrease w-7 h-7 text-gray-600 hover:bg-gray-100 rounded transition-colors flex items-center justify-center">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                            </svg>
-                                        </button>
-                                        <input type="number" 
-                                               class="quantity-input w-8 text-center text-sm font-medium bg-transparent border-0 focus:ring-0" 
-                                               value="1" 
-                                               min="1" 
-                                               max="99">
-                                        <button class="quantity-increase w-7 h-7 text-gray-600 hover:bg-gray-100 rounded transition-colors flex items-center justify-center">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                            </svg>
-                                        </button>
-                                        <button class="add-to-cart-btn flex-1 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium">
-                                            Add
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                    @else
-                        <div class="col-span-full text-center py-12">
-                            <div class="bg-gray-100 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
-                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-medium text-gray-900 mb-2">Belum Ada Menu</h3>
-                            <p class="text-gray-500 mb-4">Tambahkan menu item terlebih dahulu untuk memulai penjualan</p>
-                            <a href="{{ route('menu.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
-                                Tambah Menu
-                            </a>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-        
-        <!-- Right: Cart & Checkout -->
-        <div class="w-full lg:w-96 bg-white border-l border-gray-200 flex flex-col">
-            <!-- Right Sidebar - Cart -->
-            <div class="lg:col-span-1 bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col h-[calc(100vh-2rem)]">
-                <div class="bg-gradient-to-r from-teh-jawa-gold to-teh-jawa-brown text-white px-4 py-3 flex items-center justify-between sticky top-0 z-10">
-                    <h2 class="font-semibold text-lg">Transaksi Hari Ini</h2>
-                    <span id="cartCount" class="bg-white text-teh-jawa-gold text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">0</span>
-                </div>
-                
-                <!-- Cart Items -->
-                <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-2">
-                    <!-- Empty state will be shown when no items -->
-                    <div id="emptyCartState" class="text-center py-8 text-gray-400">
-                        <svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                        <p class="text-sm">Belum ada transaksi</p>
-                    </div>
-                </div>
-                
-                <!-- Cart Summary -->
-                <form id="checkoutForm" method="POST" action="{{ route('sales.store') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="border-t border-gray-200 p-4 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-                        <div class="space-y-2 mb-3">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Subtotal</span>
-                                <span id="cartSubtotal" class="font-medium">Rp 0</span>
-                            </div>
-                            <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-100">
-                                <span>Total</span>
-                                <span id="cartTotal" class="text-teh-jawa-gold">Rp 0</span>
-                            </div>
-                        </div>
-                        
-                        <!-- Transaction Date & Payment Method -->
-                        <div class="space-y-2 mb-3">
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Tanggal Transaksi</label>
-                                <input type="date" name="transaction_date" id="transactionDate" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teh-jawa-gold focus:border-teh-jawa-gold">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Metode Pembayaran</label>
-                                <select name="payment_method" id="paymentMethod" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teh-jawa-gold focus:border-teh-jawa-gold">
-                                    <option value="cash">Tunai</option>
-                                    <option value="qris">QRIS</option>
-                                    <option value="debit">Kartu Debit</option>
-                                    <option value="credit">Kartu Kredit</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Catatan</label>
-                                <input type="text" name="notes" id="saleNotes" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teh-jawa-gold focus:border-teh-jawa-gold" placeholder="Catatan transaksi">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-medium text-gray-700 mb-1">Upload Bukti (Nota/Kwitansi)</label>
-                                <input type="file" name="receipt" id="receiptFile" accept="image/*,.pdf" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-teh-jawa-gold focus:border-teh-jawa-gold">
-                                <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, atau PDF (Max: 2MB)</p>
-                            </div>
-                        </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="flex space-x-2">
-                            <button type="button" id="clearCartBtn" class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                Kosongkan
-                            </button>
-                            <button type="button" id="checkoutBtn" class="flex-1 px-3 py-2 bg-gradient-to-r from-teh-jawa-gold to-teh-jawa-brown text-white rounded-md text-sm font-medium hover:from-teh-jawa-gold-dark hover:to-teh-jawa-brown-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                Simpan Transaksi
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Recent Sales Modal (Optional) -->
-    <div class="fixed bottom-4 right-4 z-50">
-        <button onclick="toggleRecentSales()" class="bg-white shadow-lg rounded-full p-3 hover:shadow-xl transition-shadow">
-            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-        </button>
-    </div>
-</div>
-
-@push('styles')
 <style>
-/* Professional POS Styles */
-.line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+/* Teh Jawa Brand Colors */
+:root {
+    --tj-gold: #D4AF37;
+    --tj-gold-dark: #B8941F;
+    --tj-brown: #8B4513;
+    --tj-cream: #FFF8E7;
+    --tj-green: #4A7C28;
+}
+
+.pos-container {
+    display: flex;
+    height: calc(100vh - 64px);
+    background: linear-gradient(135deg, #FFF8E7 0%, #F4E4B1 100%);
+}
+
+/* Left Panel */
+.pos-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
     overflow: hidden;
 }
 
-/* Product Card Styles */
-.menu-item-card {
-    transition: all 0.2s ease;
+.pos-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 20px 0;
 }
 
-.menu-item-card:hover {
-    transform: translateY(-2px);
+/* Menu Dropdown */
+.menu-dropdown-container {
+    position: relative;
+    margin-bottom: 20px;
 }
 
-/* Quantity Selector Styles */
-.quantity-selector-container {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.quick-add-buttons {
+.menu-dropdown-trigger {
+    width: 100%;
+    padding: 14px 16px;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    text-align: left;
+    cursor: pointer;
     display: flex;
-    gap: 2px;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
 }
 
-.quick-add-btn {
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-}
-
-.quick-add-btn:hover {
-    border-color: #3b82f6;
-    transform: translateY(-1px);
-}
-
-.quick-add-btn:active {
-    transform: translateY(0);
-}
-
-.quantity-input {
-    -moz-appearance: textfield;
-}
-
-.quantity-input::-webkit-outer-spin-button,
-.quantity-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.quantity-input:focus {
+.menu-dropdown-trigger:hover,
+.menu-dropdown-trigger:focus {
+    border-color: var(--tj-gold);
     outline: none;
 }
 
-.quantity-decrease,
-.quantity-increase {
-    transition: all 0.2s ease;
+.menu-dropdown-trigger svg {
+    transition: transform 0.2s;
 }
 
-.quantity-decrease:hover,
-.quantity-increase:hover {
-    background-color: #e5e7eb;
+.menu-dropdown-trigger.open svg {
+    transform: rotate(180deg);
 }
 
-.add-to-cart-btn {
-    transition: all 0.2s ease;
+.menu-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 4px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+}
+
+.menu-dropdown-list.open {
+    display: block;
+}
+
+.menu-dropdown-search {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    background: white;
+}
+
+.menu-dropdown-search input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.menu-dropdown-search input:focus {
+    outline: none;
+    border-color: var(--tj-gold);
+}
+
+.menu-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.menu-dropdown-item:hover {
+    background: var(--tj-cream);
+}
+
+.menu-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.menu-dropdown-item.unavailable {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.menu-dropdown-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.menu-dropdown-img-placeholder {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.menu-dropdown-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.menu-dropdown-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.add-to-cart-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.menu-dropdown-category {
+    font-size: 11px;
+    color: #64748b;
+    margin: 2px 0 0 0;
+    text-transform: uppercase;
 }
 
-.add-to-cart-btn:active {
-    transform: translateY(0);
+.menu-dropdown-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--tj-gold);
+    white-space: nowrap;
+    margin-right: 8px;
 }
 
-/* Category Tabs */
-.category-tab {
-    transition: all 0.2s ease;
-    position: relative;
+.menu-dropdown-edit {
+    width: 32px;
+    height: 32px;
+    background: var(--tj-brown);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
 }
 
-.category-tab.active {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+.menu-dropdown-edit:hover {
+    background: #6d3710;
+    transform: scale(1.05);
+}
+
+/* Selected Menu Preview */
+.selected-menu {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: none;
+    margin-bottom: 20px;
+    border: 2px solid #e2e8f0;
+}
+
+.selected-menu.show {
+    display: block;
+}
+
+.selected-menu-content {
+    display: flex;
+    gap: 16px;
+}
+
+.selected-menu-img {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #f1f5f9;
+    flex-shrink: 0;
+}
+
+.selected-menu-info {
+    flex: 1;
+}
+
+.selected-menu-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 4px 0;
+}
+
+.selected-menu-category {
+    font-size: 12px;
+    color: #64748b;
+    text-transform: uppercase;
+    margin: 0 0 8px 0;
+}
+
+.selected-menu-price {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--tj-gold);
+    margin: 0 0 12px 0;
+}
+
+.selected-menu-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.qty-control button {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.15s;
+}
+
+.qty-control button:hover {
+    background: #e2e8f0;
+}
+
+.qty-control span {
+    width: 40px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.btn-add-cart {
+    flex: 1;
+    height: 48px;
+    background: linear-gradient(135deg, var(--tj-gold) 0%, var(--tj-brown) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-add-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-edit-menu {
+    height: 48px;
+    padding: 0 20px;
+    background: var(--tj-brown);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit-menu:hover {
+    background: #6d3710;
+}
+
+/* Header Buttons */
+.header-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    height: 44px;
+    padding: 0 20px;
+    background: linear-gradient(135deg, var(--tj-gold) 0%, var(--tj-brown) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+/* Right Panel - Cart */
+.pos-right {
+    width: 400px;
+    background: white;
+    border-left: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-header {
+    padding: 20px;
+    background: linear-gradient(135deg, var(--tj-brown) 0%, #6d3710 100%);
     color: white;
 }
 
-.category-tab:not(.active):hover {
+.cart-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.cart-header p {
+    font-size: 13px;
+    opacity: 0.7;
+    margin: 4px 0 0 0;
+}
+
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.cart-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.cart-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
+.cart-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.cart-item-remove {
+    color: #ef4444;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.cart-item-details {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cart-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.cart-item-qty button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.cart-item-qty span {
+    width: 24px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.cart-item-total {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.cart-footer {
+    padding: 20px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #1e293b;
+}
+
+.cart-total span:last-child {
+    color: var(--tj-gold);
+}
+
+.cart-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.cart-form input,
+.cart-form select,
+.cart-form textarea {
+    width: 100%;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.cart-form textarea {
+    height: 60px;
+    padding: 12px 14px;
+    resize: none;
+}
+
+.cart-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-clear {
+    flex: 1;
+    height: 48px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-checkout {
+    flex: 2;
+    height: 48px;
+    background: linear-gradient(135deg, var(--tj-gold) 0%, var(--tj-brown) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-checkout:hover {
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 16px;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--tj-gold) 0%, var(--tj-brown) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header.edit {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.modal-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    max-height: calc(85vh - 120px);
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 5px;
+}
+
+.form-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--tj-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.form-textarea {
+    height: 70px;
+    padding: 10px 12px;
+    resize: none;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.form-hint {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 4px;
+}
+
+.form-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.form-checkbox:hover {
     background: #f3f4f6;
+}
+
+.form-checkbox input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--tj-gold);
+}
+
+.form-checkbox span {
+    font-size: 13px;
     color: #374151;
 }
 
-/* Cart Animations */
-#cartCount {
-    transition: all 0.3s ease;
+.form-stock-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-#cartCount.animate-bounce {
-    animation: bounce 0.5s ease;
+.form-stock-row .form-input {
+    flex: 1;
 }
 
-@keyframes bounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+.modal-footer {
+    padding: 14px 20px;
+    background: #f9fafb;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid #e5e7eb;
 }
 
-/* Custom Scrollbar */
-.overflow-y-auto::-webkit-scrollbar {
-    width: 6px;
+.btn-cancel {
+    flex: 1;
+    height: 40px;
+    border: 1.5px solid #e5e7eb;
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.overflow-y-auto::-webkit-scrollbar-track {
-    background: #f1f5f9;
-    border-radius: 3px;
+.btn-cancel:hover {
+    background: #f3f4f6;
 }
 
-.overflow-y-auto::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 3px;
+.btn-submit {
+    flex: 1;
+    height: 40px;
+    border: none;
+    background: linear-gradient(135deg, var(--tj-gold) 0%, var(--tj-brown) 100%);
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+.btn-submit:hover {
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
 }
 
-/* Focus States */
-.focus\:ring-2:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.btn-delete {
+    height: 40px;
+    padding: 0 14px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-/* Button States */
-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-/* Fixed 4-Column Grid Layout */
-#menuGrid {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 1rem !important;
-    padding: 1rem !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 1024px) {
-    #menuGrid {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 768px) {
-    #menuGrid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    #menuGrid {
-        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-    }
-}
-
-/* Consistent card sizing */
-.menu-item-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-height: 280px !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.menu-item-card > div {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.menu-item-card .p-3 {
-    margin-top: auto !important;
-}
-
-/* Force hide all toggle elements */
-.quantity-selector-container,
-.quick-add-buttons,
-.quick-add-btn,
-[data-quantity="1"],
-[data-quantity="2"],
-[data-quantity="3"],
-[data-quantity="5"] {
-    display: none !important;
-    visibility: hidden !important;
-}
-
-/* Only show simple quantity controls */
-.quantity-decrease,
-.quantity-input,
-.quantity-increase,
-.add-to-cart-btn {
-    display: flex !important;
-    visibility: visible !important;
-}
-@media (max-width: 640px) {
-    .grid-cols-2 {
-        grid-template-columns: repeat(1, 1fr);
-    }
-    
-    .quick-add-buttons {
-        flex-wrap: wrap;
-    }
-    
-    .quick-add-btn {
-        flex: 0 0 calc(50% - 1px);
-    }
-}
-
-@media (min-width: 641px) and (max-width: 768px) {
-    .grid-cols-3 {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-    .grid-cols-4 {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .grid-cols-5 {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-@media (min-width: 1025px) and (max-width: 1280px) {
-    .grid-cols-6 {
-        grid-template-columns: repeat(5, 1fr);
-    }
-}
-
-/* Mobile Layout Adjustments */
-@media (max-width: 1024px) {
-    .lg\:w-96 {
-        width: 100%;
-    }
-    
-    .flex-col.lg\:flex-row {
-        flex-direction: column;
-    }
-    
-    .h-\[calc\(100vh-4rem\)\] {
-        height: auto;
-        min-height: calc(100vh - 4rem);
-    }
-}
-
-/* Loading States */
-.loading {
-    position: relative;
-    overflow: hidden;
-}
-
-.loading::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-/* Success Animation */
-.success-animation {
-    animation: success 0.5s ease;
-}
-
-@keyframes success {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
+.btn-delete:hover {
+    background: #dc2626;
 }
 </style>
-@endpush
 
-@push('scripts')
+<div class="pos-container">
+    <!-- Left Panel -->
+    <div class="pos-left">
+        <h1 class="pos-title">Point of Sale</h1>
+        
+        <!-- Action Buttons -->
+        <div class="header-actions">
+            <button class="btn-primary" onclick="openAddModal()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Tambah Menu
+            </button>
+        </div>
+
+        <!-- Menu Dropdown -->
+        <div class="menu-dropdown-container">
+            <button type="button" class="menu-dropdown-trigger" id="menuDropdownTrigger" onclick="toggleDropdown()">
+                <span>Pilih Menu...</span>
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <div class="menu-dropdown-list" id="menuDropdownList">
+                <div class="menu-dropdown-search">
+                    <input type="text" id="menuSearch" placeholder="Cari menu..." oninput="filterMenu()">
+                </div>
+                @foreach($menuItems as $item)
+                <div class="menu-dropdown-item {{ !$item->is_available ? 'unavailable' : '' }}" 
+                     data-id="{{ $item->id }}"
+                     data-name="{{ e($item->name) }}"
+                     data-price="{{ $item->price }}"
+                     data-category="{{ e($categoryLabels[$item->category] ?? $item->category) }}"
+                     data-image="{{ $item->image ? asset('storage/'.$item->image) : '' }}">
+                    @if($item->image)
+                        <img src="{{ asset('storage/'.$item->image) }}" class="menu-dropdown-img" loading="lazy" onclick="selectMenu(this.parentElement)">
+                    @else
+                        <div class="menu-dropdown-img-placeholder" onclick="selectMenu(this.parentElement)">
+                            <svg width="20" height="20" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                    @endif
+                    <div class="menu-dropdown-info" onclick="selectMenu(this.parentElement)">
+                        <p class="menu-dropdown-name">{{ $item->name }}</p>
+                        <p class="menu-dropdown-category">{{ $categoryLabels[$item->category] ?? $item->category }}</p>
+                    </div>
+                    <span class="menu-dropdown-price" onclick="selectMenu(this.parentElement)">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                    <button type="button" class="menu-dropdown-edit" onclick="event.stopPropagation(); openEditModal({{ $item->id }})" title="Edit Menu">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </button>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <!-- Selected Menu Preview -->
+        <div class="selected-menu" id="selectedMenu">
+            <div class="selected-menu-content">
+                <img src="" id="selectedImg" class="selected-menu-img">
+                <div class="selected-menu-info">
+                    <h3 class="selected-menu-name" id="selectedName">-</h3>
+                    <p class="selected-menu-category" id="selectedCategory">-</p>
+                    <p class="selected-menu-price" id="selectedPrice">Rp 0</p>
+                    <div class="selected-menu-actions">
+                        <div class="qty-control">
+                            <button type="button" onclick="changeQty(-1)">−</button>
+                            <span id="selectedQty">1</span>
+                            <button type="button" onclick="changeQty(1)">+</button>
+                        </div>
+                        <button type="button" class="btn-add-cart" onclick="addSelectedToCart()">
+                            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                            </svg>
+                            Tambah ke Keranjang
+                        </button>
+                        <button type="button" class="btn-edit-menu" onclick="editSelectedMenu()">Edit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel - Cart -->
+    <div class="pos-right">
+        <div class="cart-header">
+            <h2>🛒 Keranjang</h2>
+            <p id="cartCount">0 item</p>
+        </div>
+
+        <div class="cart-items" id="cartItems">
+            <div class="cart-empty">
+                <p>Keranjang kosong</p>
+                <p style="font-size: 13px;">Pilih menu untuk menambahkan</p>
+            </div>
+        </div>
+
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span id="cartTotal">Rp 0</span>
+            </div>
+
+            <form id="checkoutForm" class="cart-form" enctype="multipart/form-data">
+                <input type="date" name="transaction_date" value="{{ date('Y-m-d') }}" required>
+                <select name="payment_method" required>
+                    <option value="">Metode Pembayaran</option>
+                    <option value="Tunai">Tunai</option>
+                    <option value="QRIS">QRIS</option>
+                    <option value="Transfer">Transfer Bank</option>
+                    <option value="Debit">Kartu Debit</option>
+                </select>
+                <textarea name="notes" placeholder="Catatan (opsional)"></textarea>
+                <div style="position: relative;">
+                    <input type="file" name="receipt" id="receiptInput" accept="image/*,.pdf" style="display: none;">
+                    <button type="button" onclick="document.getElementById('receiptInput').click()" style="width: 100%; height: 44px; border: 1px dashed #e2e8f0; background: #f8fafc; border-radius: 10px; font-size: 14px; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        <span id="receiptLabel">Upload Bukti/Struk</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="cart-actions">
+                <button type="button" class="btn-clear" onclick="clearCart()">Hapus</button>
+                <button type="button" class="btn-checkout" onclick="checkout()" id="checkoutBtn">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Proses
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Menu Modal -->
+<div class="modal-overlay" id="addModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>➕ Tambah Menu Baru</h3>
+            <button class="modal-close" onclick="closeAddModal()">✕</button>
+        </div>
+        <form id="addMenuForm">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nama Menu *</label>
+                    <input type="text" name="name" class="form-input" placeholder="Contoh: Nasi Goreng Special" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Kategori *</label>
+                        <select name="category" class="form-input" required>
+                            <option value="">Pilih Kategori</option>
+                            @foreach($categoryLabels as $val => $label)
+                                <option value="{{ $val }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Harga (Rp) *</label>
+                        <input type="number" name="price" class="form-input" placeholder="0" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="description" class="form-input form-textarea" placeholder="Deskripsi menu (opsional)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stok</label>
+                    <div class="form-stock-row">
+                        <input type="number" name="stock" id="addStock" class="form-input" placeholder="Jumlah stok" min="0" value="">
+                    </div>
+                    <label class="form-checkbox" style="margin-top: 8px;">
+                        <input type="checkbox" id="addUnlimitedStock" onchange="toggleAddStock()" checked>
+                        <span>Stok tidak terbatas</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gambar</label>
+                    <input type="file" name="image" class="form-input" accept="image/*" style="padding: 8px;">
+                </div>
+                <label class="form-checkbox">
+                    <input type="checkbox" name="is_available" value="1" checked>
+                    <span>Menu tersedia untuk dijual</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="closeAddModal()">Batal</button>
+                <button type="submit" class="btn-submit">💾 Simpan Menu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Menu Modal -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal">
+        <div class="modal-header edit">
+            <h3>✏️ Edit Menu</h3>
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+        </div>
+        <form id="editMenuForm">
+            <input type="hidden" name="id" id="editId">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nama Menu *</label>
+                    <input type="text" name="name" id="editName" class="form-input" placeholder="Nama menu" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Kategori *</label>
+                        <select name="category" id="editCategory" class="form-input" required>
+                            <option value="">Pilih Kategori</option>
+                            @foreach($categoryLabels as $val => $label)
+                                <option value="{{ $val }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Harga (Rp) *</label>
+                        <input type="number" name="price" id="editPrice" class="form-input" placeholder="0" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <textarea name="description" id="editDescription" class="form-input form-textarea" placeholder="Deskripsi menu (opsional)"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Stok</label>
+                    <div class="form-stock-row">
+                        <input type="number" name="stock" id="editStock" class="form-input" placeholder="Jumlah stok" min="0">
+                    </div>
+                    <label class="form-checkbox" style="margin-top: 8px;">
+                        <input type="checkbox" id="editUnlimitedStock" onchange="toggleEditStock()">
+                        <span>Stok tidak terbatas</span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gambar Baru (opsional)</label>
+                    <input type="file" name="image" class="form-input" accept="image/*" style="padding: 8px;">
+                </div>
+                <label class="form-checkbox">
+                    <input type="checkbox" name="is_available" id="editAvailable" value="1">
+                    <span>Menu tersedia untuk dijual</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-delete" onclick="deleteMenu()">🗑️ Hapus</button>
+                <button type="button" class="btn-cancel" onclick="closeEditModal()">Batal</button>
+                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">💾 Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Set default transaction date to today
-    const transactionDateInput = document.getElementById('transactionDate');
-    if (transactionDateInput) {
-        transactionDateInput.value = new Date().toISOString().split('T')[0];
+// State
+let cart = [];
+let selectedItem = null;
+let selectedQty = 1;
+
+// Format
+function formatRp(n) { return new Intl.NumberFormat('id-ID').format(n); }
+
+// Receipt file handler
+document.getElementById('receiptInput').addEventListener('change', function(e) {
+    const label = document.getElementById('receiptLabel');
+    if (e.target.files.length > 0) {
+        label.textContent = '✓ ' + e.target.files[0].name;
+        label.style.color = '#22c55e';
+    } else {
+        label.textContent = 'Upload Bukti/Struk';
+        label.style.color = '#64748b';
+    }
+});
+
+// Dropdown
+function toggleDropdown() {
+    const list = document.getElementById('menuDropdownList');
+    const trigger = document.getElementById('menuDropdownTrigger');
+    list.classList.toggle('open');
+    trigger.classList.toggle('open');
+}
+
+function filterMenu() {
+    const search = document.getElementById('menuSearch').value.toLowerCase();
+    document.querySelectorAll('.menu-dropdown-item').forEach(item => {
+        const name = (item.dataset.name || '').toLowerCase();
+        item.style.display = name.includes(search) ? 'flex' : 'none';
+    });
+}
+
+function selectMenu(el) {
+    if (!el || !el.dataset) return;
+    
+    const name = el.dataset.name || 'Menu';
+    const price = parseInt(el.dataset.price) || 0;
+    const category = el.dataset.category || '';
+    const image = el.dataset.image || '';
+    const id = el.dataset.id || '';
+    
+    selectedItem = { id, name, price, category, image };
+    selectedQty = 1;
+    
+    // Update trigger text
+    document.getElementById('menuDropdownTrigger').querySelector('span').textContent = name;
+    
+    // Show preview
+    document.getElementById('selectedMenu').classList.add('show');
+    document.getElementById('selectedName').textContent = name;
+    document.getElementById('selectedCategory').textContent = category;
+    document.getElementById('selectedPrice').textContent = 'Rp ' + formatRp(price);
+    document.getElementById('selectedQty').textContent = '1';
+    
+    if (image) {
+        document.getElementById('selectedImg').src = image;
+        document.getElementById('selectedImg').style.display = 'block';
+    } else {
+        document.getElementById('selectedImg').style.display = 'none';
     }
     
-    // Initialize cart
-    let cart = [];
+    // Close dropdown
+    document.getElementById('menuDropdownList').classList.remove('open');
+    document.getElementById('menuDropdownTrigger').classList.remove('open');
+}
+
+function changeQty(delta) {
+    selectedQty = Math.max(1, selectedQty + delta);
+    document.getElementById('selectedQty').textContent = selectedQty;
+}
+
+function addSelectedToCart() {
+    if (!selectedItem) return;
     
-    // Get CSRF token
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const existing = cart.find(i => i.id === selectedItem.id);
+    if (existing) {
+        existing.qty += selectedQty;
+    } else {
+        cart.push({ ...selectedItem, qty: selectedQty });
+    }
+    renderCart();
     
-    // Verify CSRF token exists
-    if (!csrfToken) {
-        console.error('❌ CSRF token not found!');
-        alert('Security token not found. Please refresh the page and try again.');
+    // Reset selection
+    document.getElementById('selectedMenu').classList.remove('show');
+    document.getElementById('menuDropdownTrigger').querySelector('span').textContent = 'Pilih Menu...';
+    selectedItem = null;
+}
+
+function editSelectedMenu() {
+    if (!selectedItem) return;
+    openEditModal(selectedItem.id);
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+    const container = document.querySelector('.menu-dropdown-container');
+    if (!container.contains(e.target)) {
+        document.getElementById('menuDropdownList').classList.remove('open');
+        document.getElementById('menuDropdownTrigger').classList.remove('open');
+    }
+});
+
+// Cart
+function renderCart() {
+    const container = document.getElementById('cartItems');
+    
+    if (cart.length === 0) {
+        container.innerHTML = '<div class="cart-empty"><p>Keranjang kosong</p><p style="font-size: 13px;">Pilih menu untuk menambahkan</p></div>';
+        document.getElementById('cartCount').textContent = '0 item';
+        document.getElementById('cartTotal').textContent = 'Rp 0';
         return;
     }
     
-    console.log('✅ CSRF token found:', csrfToken.substring(0, 20) + '...');
-
-    // SIMPLE TEST FUNCTION - Add this for debugging
-    window.testCart = function() {
-        console.log('🧪 Testing cart system...');
-        
-        // Test 1: Check if DOM elements exist
-        const cartItemsContainer = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const cartSubtotal = document.getElementById('cartSubtotal');
-        const cartTax = document.getElementById('cartTax');
-        const cartCount = document.getElementById('cartCount');
-        
-        console.log('🔍 DOM Elements:', {
-            cartItems: !!cartItemsContainer,
-            cartTotal: !!cartTotal,
-            cartSubtotal: !!cartSubtotal,
-            cartTax: !!cartTax,
-            cartCount: !!cartCount
-        });
-        
-        // Test 2: Try to add a test item manually
-        console.log('🧪 Adding test item...');
-        addToCart('test-123', 'Test Item', 10000, 2);
-        
-        // Test 3: Check cart state
-        console.log('🧪 Cart state after test:', cart);
-        
-        // Test 4: Try to update cart manually
-        console.log('🧪 Manually calling updateCart...');
-        updateCart();
-        
-        return 'Test completed - check console';
-    };
+    let html = '';
+    let total = 0;
     
-    // Debug: Check if elements exist
-    const cartItemsContainer = document.getElementById('cartItems');
-    const cartTotal = document.getElementById('cartTotal');
-    const cartSubtotal = document.getElementById('cartSubtotal');
-    const cartTax = document.getElementById('cartTax');
-    const cartCount = document.getElementById('cartCount');
-    
-    console.log('🔍 DOM Elements Check:', {
-        cartItemsContainer: !!cartItemsContainer,
-        cartTotal: !!cartTotal,
-        cartSubtotal: !!cartSubtotal,
-        cartTax: !!cartTax,
-        cartCount: !!cartCount
-    });
-    
-    // Category filter
-    const categoryTabs = document.querySelectorAll('.category-tab');
-    const menuItems = document.querySelectorAll('.menu-item-card');
-    
-    console.log('📊 Category Tabs:', categoryTabs.length);
-    console.log('📊 Menu Items:', menuItems.length);
-    console.log('📊 Menu Grid exists:', !!document.getElementById('menuGrid'));
-    
-    // Debug: Check if menu items are in DOM
-    const menuGrid = document.getElementById('menuGrid');
-    if (menuGrid) {
-        console.log('📊 Menu Grid children:', menuGrid.children.length);
-        console.log('📊 Menu Grid HTML:', menuGrid.innerHTML.substring(0, 200) + '...');
-    } else {
-        console.error('❌ Menu Grid not found!');
-    }
-    
-    categoryTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const category = this.dataset.category;
-            console.log('🏷️ Category clicked:', category);
-            
-            // Update active tab
-            categoryTabs.forEach(t => {
-                t.classList.remove('active', 'bg-blue-600', 'text-white');
-                t.classList.add('bg-gray-100', 'text-gray-700');
-            });
-            this.classList.remove('bg-gray-100', 'text-gray-700');
-            this.classList.add('active', 'bg-blue-600', 'text-white');
-            
-            // Filter menu items
-            menuItems.forEach(item => {
-                if (category === 'all' || item.dataset.category === category) {
-                    item.style.display = 'block';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-    });
-    
-    // Add to cart - Simplified event handling
-    document.addEventListener('click', function(e) {
-        console.log('🖱️ Click detected on:', e.target.className, e.target.tagName);
-        
-        // Handle Quick Add Buttons
-        if (e.target.classList.contains('quick-add-btn') || e.target.closest('.quick-add-btn')) {
-            console.log('🔘 Quick Add button clicked');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const quickAddBtn = e.target.classList.contains('quick-add-btn') ? e.target : e.target.closest('.quick-add-btn');
-            const menuCard = quickAddBtn.closest('.menu-item-card');
-            const quantity = parseInt(quickAddBtn.dataset.quantity);
-            
-            console.log('🔍 Quick Add data:', { menuCard: !!menuCard, quantity });
-            
-            if (menuCard) {
-                const menuId = menuCard.dataset.menuId;
-                const menuName = menuCard.dataset.menuName;
-                const menuPrice = parseFloat(menuCard.dataset.menuPrice);
-                
-                console.log('📦 Quick Add data from card:', { menuId, menuName, menuPrice, quantity });
-                
-                addToCart(menuId, menuName, menuPrice, quantity);
-                
-                // Visual feedback
-                quickAddBtn.classList.add('bg-blue-600', 'text-white');
-                setTimeout(() => {
-                    quickAddBtn.classList.remove('bg-blue-600', 'text-white');
-                }, 300);
-                
-                // Add success animation to card
-                menuCard.classList.add('success-animation');
-                setTimeout(() => {
-                    menuCard.classList.remove('success-animation');
-                }, 500);
-            }
-            return;
-        }
-        
-        // Handle Add Button with custom quantity
-        if (e.target.classList.contains('add-to-cart-btn') || e.target.closest('.add-to-cart-btn')) {
-            console.log('➕ Add button clicked');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const addBtn = e.target.classList.contains('add-to-cart-btn') ? e.target : e.target.closest('.add-to-cart-btn');
-            const menuCard = addBtn.closest('.menu-item-card');
-            
-            console.log('🔍 Add button data:', { menuCard: !!menuCard });
-            
-            if (menuCard) {
-                const menuId = menuCard.dataset.menuId;
-                const menuName = menuCard.dataset.menuName;
-                const menuPrice = parseFloat(menuCard.dataset.menuPrice);
-                const quantityInput = menuCard.querySelector('.quantity-input');
-                const quantity = parseInt(quantityInput.value) || 1;
-                
-                console.log('📦 Add button data from card:', { menuId, menuName, menuPrice, quantity });
-                
-                addToCart(menuId, menuName, menuPrice, quantity);
-                
-                // Visual feedback
-                addBtn.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    addBtn.style.transform = '';
-                }, 150);
-                
-                // Add success animation to card
-                menuCard.classList.add('success-animation');
-                setTimeout(() => {
-                    menuCard.classList.remove('success-animation');
-                }, 500);
-                
-                // Reset quantity to 1 after adding
-                quantityInput.value = 1;
-            }
-            return;
-        }
-        
-        // Handle Quantity Decrease
-        if (e.target.classList.contains('quantity-decrease') || e.target.closest('.quantity-decrease')) {
-            console.log('➖ Decrease button clicked');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const decreaseBtn = e.target.classList.contains('quantity-decrease') ? e.target : e.target.closest('.quantity-decrease');
-            const input = decreaseBtn.parentElement.querySelector('.quantity-input');
-            const currentValue = parseInt(input.value) || 1;
-            if (currentValue > 1) {
-                input.value = currentValue - 1;
-                console.log('📉 Quantity decreased to:', input.value);
-            }
-            return;
-        }
-        
-        // Handle Quantity Increase
-        if (e.target.classList.contains('quantity-increase') || e.target.closest('.quantity-increase')) {
-            console.log('➕ Increase button clicked');
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const increaseBtn = e.target.classList.contains('quantity-increase') ? e.target : e.target.closest('.quantity-increase');
-            const input = increaseBtn.parentElement.querySelector('.quantity-input');
-            const currentValue = parseInt(input.value) || 1;
-            if (currentValue < 99) {
-                input.value = currentValue + 1;
-                console.log('📈 Quantity increased to:', input.value);
-            }
-            return;
-        }
-        
-        // Handle Card Click (for adding 1 item)
-        if (e.target.closest('.menu-item-card') && 
-            !e.target.closest('.add-to-cart-btn') && 
-            !e.target.closest('.quick-add-btn') && 
-            !e.target.closest('.quantity-decrease') && 
-            !e.target.closest('.quantity-increase') && 
-            !e.target.closest('.quantity-input')) {
-            
-            console.log('🃏 Card click detected');
-            const menuCard = e.target.closest('.menu-item-card');
-            const menuId = menuCard.dataset.menuId;
-            const menuName = menuCard.dataset.menuName;
-            const menuPrice = parseFloat(menuCard.dataset.menuPrice);
-            
-            console.log('🃏 Card click data:', { menuId, menuName, menuPrice });
-            
-            addToCart(menuId, menuName, menuPrice, 1);
-            
-            // Visual feedback
-            menuCard.classList.add('success-animation');
-            setTimeout(() => {
-                menuCard.classList.remove('success-animation');
-            }, 500);
-        }
-    });
-    
-    // Handle quantity input validation
-    document.addEventListener('input', function(e) {
-        if (e.target.classList.contains('quantity-input')) {
-            const value = parseInt(e.target.value) || 1;
-            if (value < 1) {
-                e.target.value = 1;
-            } else if (value > 99) {
-                e.target.value = 99;
-            }
-        }
-    });
-        
-    function addToCart(id, name, price, quantity = 1) {
-        console.log('🛒 addToCart called:', { id, name, price, quantity });
-        console.log('🛒 Current cart:', cart);
-        
-        // Validate inputs
-        if (!id || !name || isNaN(price) || isNaN(quantity) || quantity < 1) {
-            console.error('❌ Invalid input:', { id, name, price, quantity });
-            return;
-        }
-        
-        const existingItem = cart.find(item => item.id === id);
-        
-        if (existingItem) {
-            existingItem.quantity += quantity;
-            console.log('📝 Updated existing item:', existingItem);
-        } else {
-            const newItem = {
-                id: id,
-                name: name,
-                price: parseFloat(price),
-                quantity: parseInt(quantity)
-            };
-            cart.push(newItem);
-            console.log('➕ Added new item:', newItem);
-        }
-        
-        console.log('🛒 Cart after update:', cart);
-        updateCart();
-    }
-    
-    window.removeFromCart = function(id) {
-        cart = cart.filter(item => item.id !== id);
-        updateCart();
-    }
-
-    window.updateQuantity = function(id, newQuantity) {
-        if (newQuantity <= 0) {
-            removeFromCart(id);
-            return;
-        }
-        
-        const item = cart.find(item => item.id === id);
-        if (item) {
-            item.quantity = newQuantity;
-            updateCart();
-        }
-    }
-    
-    function updateCart() {
-        console.log('🔄 updateCart called');
-        console.log('🔄 Current cart state:', cart);
-        
-        const cartItemsContainer = document.getElementById('cartItems');
-        const cartTotal = document.getElementById('cartTotal');
-        const cartSubtotal = document.getElementById('cartSubtotal');
-        const cartCount = document.getElementById('cartCount');
-        const clearCartBtn = document.getElementById('clearCartBtn');
-        const checkoutBtn = document.getElementById('checkoutBtn');
-        
-        console.log('🔍 DOM Elements in updateCart:', {
-            cartItemsContainer: !!cartItemsContainer,
-            cartTotal: !!cartTotal,
-            cartSubtotal: !!cartSubtotal,
-            cartCount: !!cartCount,
-            clearCartBtn: !!clearCartBtn,
-            checkoutBtn: !!checkoutBtn
-        });
-        
-        if (cart.length === 0) {
-            console.log('📦 Cart is empty');
-            cartItemsContainer.innerHTML = `
-                <div class="text-center py-8 text-gray-400">
-                    <svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                    <p class="text-sm font-medium">Belum ada transaksi</p>
-                    <p class="text-xs mt-1">Pilih produk untuk memulai</p>
+    cart.forEach((item, i) => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        const itemName = item.name || 'Menu';
+        html += `
+        <div class="cart-item">
+            <div class="cart-item-row">
+                <span class="cart-item-name">${itemName}</span>
+                <button type="button" class="cart-item-remove" onclick="removeItem(${i})">✕</button>
+            </div>
+            <div class="cart-item-details">
+                <div class="cart-item-qty">
+                    <button type="button" onclick="updateQty(${i}, -1)">−</button>
+                    <span>${item.qty}</span>
+                    <button type="button" onclick="updateQty(${i}, 1)">+</button>
                 </div>
-            `;
-            
-            const subtotal = 0;
-            const total = 0;
-            const itemCount = 0;
-            
-            cartSubtotal.textContent = 'Rp ' + number_format(subtotal, 0);
-            cartTotal.textContent = 'Rp ' + number_format(total, 0);
-            cartCount.textContent = itemCount;
-            clearCartBtn.disabled = true;
-            checkoutBtn.disabled = true;
+                <span class="cart-item-total">Rp ${formatRp(subtotal)}</span>
+            </div>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+    document.getElementById('cartCount').textContent = cart.length + ' item';
+    document.getElementById('cartTotal').textContent = 'Rp ' + formatRp(total);
+}
+
+function updateQty(i, delta) {
+    cart[i].qty += delta;
+    if (cart[i].qty <= 0) cart.splice(i, 1);
+    renderCart();
+}
+
+function removeItem(i) {
+    cart.splice(i, 1);
+    renderCart();
+}
+
+function clearCart() {
+    if (cart.length === 0) return;
+    if (confirm('Hapus semua item?')) {
+        cart = [];
+        renderCart();
+    }
+}
+
+// Checkout
+async function checkout() {
+    if (cart.length === 0) return alert('Keranjang kosong!');
+    
+    const form = document.getElementById('checkoutForm');
+    const formData = new FormData(form);
+    
+    if (!formData.get('payment_method')) return alert('Pilih metode pembayaran!');
+    
+    formData.append('items', JSON.stringify(cart.map(i => ({ menu_item_id: i.id, quantity: i.qty }))));
+    
+    const btn = document.getElementById('checkoutBtn');
+    btn.disabled = true;
+    btn.textContent = 'Memproses...';
+    
+    try {
+        const res = await fetch('{{ route("sales.store") }}', {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+            body: formData
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('✅ Transaksi berhasil!\nTotal: Rp ' + formatRp(data.total_amount));
+            cart = [];
+            renderCart();
+            form.reset();
+            form.querySelector('[name="transaction_date"]').value = '{{ date("Y-m-d") }}';
         } else {
-            console.log('📦 Cart has items:', cart.length);
-            let html = '';
-            let subtotal = 0;
-            let itemCount = 0;
-            
-            cart.forEach((item, index) => {
-                const itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
-                itemCount += item.quantity;
-                
-                console.log(`📋 Item ${index}:`, { 
-                    name: item.name, 
-                    price: item.price, 
-                    quantity: item.quantity, 
-                    total: itemTotal 
-                });
-                
-                html += `
-                    <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                        <div class="flex-1">
-                            <p class="font-medium text-sm text-gray-900">${item.name}</p>
-                            <p class="text-xs text-gray-500">Rp ${number_format(item.price, 0)} × ${item.quantity}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="flex items-center bg-gray-100 rounded-lg">
-                                <button onclick="updateQuantity('${item.id}', ${item.quantity - 1})" 
-                                        class="p-1.5 hover:bg-gray-200 rounded-l-lg transition-colors ${item.quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''}"
-                                        ${item.quantity <= 1 ? 'disabled' : ''}>
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                    </svg>
-                                </button>
-                                <span class="px-3 py-1 text-sm font-medium w-8 text-center">${item.quantity}</span>
-                                <button onclick="updateQuantity('${item.id}', ${item.quantity + 1})" 
-                                        class="p-1.5 hover:bg-gray-200 rounded-r-lg transition-colors">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                    </svg>
-                                </button>
-                            </div>
-                            <button onclick="removeFromCart('${item.id}')" class="text-red-500 hover:text-red-700 p-1.5 transition-colors">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            cartItemsContainer.innerHTML = html;
-            
-            const total = subtotal;
-            
-            console.log('💰 Calculated totals:', { subtotal, total, itemCount });
-            
-            cartSubtotal.textContent = 'Rp ' + number_format(subtotal, 0);
-            cartTotal.textContent = 'Rp ' + number_format(total, 0);
-            cartCount.textContent = itemCount;
-            clearCartBtn.disabled = false;
-            checkoutBtn.disabled = false;
-            
-            // Add animation
-            cartCount.classList.add('animate-bounce');
-            setTimeout(() => {
-                cartCount.classList.remove('animate-bounce');
-            }, 500);
+            alert('❌ ' + data.message);
         }
+    } catch (err) {
+        alert('❌ Error: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Proses';
     }
-    
-    
-    // Checkout process - COMPLETELY REBUILT
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const checkoutForm = document.getElementById('checkoutForm');
-    const clearCartBtn = document.getElementById('clearCartBtn');
-    
-    console.log('🔧 Initializing checkout system...');
-    console.log('📋 Form element:', !!checkoutForm);
-    console.log('🔘 Checkout button:', !!checkoutBtn);
-    console.log('🗑️ Clear button:', !!clearCartBtn);
-    console.log('🔐 CSRF token:', csrfToken ? '✅ Found' : '❌ Missing');
-    
-    // Clear cart functionality
-    if (clearCartBtn) {
-        clearCartBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('🗑️ Clear cart clicked');
-            
-            if (confirm('Apakah Anda yakin ingin mengosongkan transaksi?')) {
-                cart = [];
-                updateCart();
-                console.log('✅ Cart cleared');
-            }
-        });
-    }
-    
-    // MAIN CHECKOUT FUNCTIONALITY
-    if (checkoutBtn && checkoutForm) {
-        checkoutBtn.addEventListener('click', async function(e) {
-            console.log('🚀 CHECKOUT PROCESS STARTED');
-            e.preventDefault();
-            
-            // Step 1: Validate cart
-            if (!cart || cart.length === 0) {
-                console.error('❌ Cart is empty');
-                alert('ERROR: Keranjang belanja masih kosong! Silakan tambahkan produk terlebih dahulu.');
-                return;
-            }
-            console.log('✅ Cart validation passed - Items:', cart.length);
-            
-            // Step 2: Get form elements
-            const transactionDateInput = document.getElementById('transactionDate');
-            const paymentMethodSelect = document.getElementById('paymentMethod');
-            const saleNotesInput = document.getElementById('saleNotes');
-            const receiptFileInput = document.getElementById('receiptFile');
-            
-            console.log('📝 Form elements:', {
-                transactionDate: !!transactionDateInput,
-                paymentMethod: !!paymentMethodSelect,
-                saleNotes: !!saleNotesInput,
-                receiptFile: !!receiptFileInput
-            });
-            
-            // Step 3: Get form values with validation
-            const transactionDate = transactionDateInput?.value || new Date().toISOString().split('T')[0];
-            const paymentMethod = paymentMethodSelect?.value || 'cash';
-            const saleNotes = saleNotesInput?.value || '';
-            const receiptFile = receiptFileInput?.files[0] || null;
-            
-            console.log('📋 Form data collected:', {
-                transactionDate,
-                paymentMethod,
-                saleNotes,
-                receiptFile: receiptFile ? receiptFile.name : 'none'
-            });
-            
-            // Step 4: Calculate totals
-            let subtotal = 0;
-            let itemCount = 0;
-            const orderItems = cart.map(item => {
-                const itemTotal = item.price * item.quantity;
-                subtotal += itemTotal;
-                itemCount += item.quantity;
-                return {
-                    menu_item_id: item.id,
-                    quantity: item.quantity,
-                    notes: null
-                };
-            });
-            
-            const total = subtotal;
-            
-            console.log('💰 Calculation results:', {
-                itemCount,
-                subtotal,
-                total,
-                orderItems
-            });
-            
-            // Step 5: Create FormData
-            const formData = new FormData();
-            formData.append('items', JSON.stringify(orderItems));
-            formData.append('transaction_date', transactionDate);
-            formData.append('payment_method', paymentMethod);
-            formData.append('notes', saleNotes);
-            formData.append('subtotal', subtotal);
-            formData.append('total', total);
-            formData.append('item_count', itemCount);
-            
-            if (receiptFile) {
-                formData.append('receipt', receiptFile);
-                console.log('📎 Receipt file added:', receiptFile.name);
-            }
-            
-            // Debug: Log FormData contents
-            console.log('📋 FormData contents:');
-            for (let [key, value] of formData.entries()) {
-                if (key === 'items') {
-                    console.log(`  ${key}:`, JSON.parse(value));
-                } else if (key === 'receipt') {
-                    console.log(`  ${key}:`, value.name, 'Size:', value.size);
-                } else {
-                    console.log(`  ${key}:`, value);
-                }
-            }
-            
-            // Step 6: Validate CSRF token
-            if (!csrfToken) {
-                console.error('❌ CSRF token missing');
-                alert('ERROR: Security token tidak ditemukan. Silakan refresh halaman.');
-                return;
-            }
-            
-            console.log('🔐 CSRF token validated');
-            console.log('📦 FormData prepared, sending to server...');
-            
-            // Step 7: Show loading state
-            const originalText = this.innerHTML;
-            this.disabled = true;
-            this.innerHTML = '⏳ Memproses...';
-            this.classList.add('opacity-75', 'cursor-not-allowed');
-            
-            try {
-                // Step 8: Send request
-                const response = await fetch('/sales', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: formData
-                });
-                
-                console.log('📡 Server response status:', response.status);
-                console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
-                
-                // Step 9: Process response
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('❌ Server error response:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log('✅ Success response:', data);
-                
-                // Step 10: Handle success
-                if (data.success) {
-                    console.log('✅ SUCCESS - Transaction data:', data);
-                    
-                    // Show detailed success notification
-                    const successMessage = `✅ Transaksi BERHASIL disimpan!\n\n` +
-                        `📝 ID: ${data.transaction_id}\n` +
-                        `💰 Total: Rp ${number_format(data.total_amount || total, 0)}\n` +
-                        `📅 Tanggal: ${data.transaction_date || transactionDate}\n` +
-                        `💳 Metode: ${data.payment_method || paymentMethod}\n` +
-                        `📋 Deskripsi: ${data.description || 'Penjualan Menu'}\n\n` +
-                        `✅ Data telah masuk ke tabel transaksi PEMASUKAN`;
-                    
-                    alert(successMessage);
-                    
-                    // Clear cart
-                    cart = [];
-                    updateCart();
-                    
-                    // Reset form
-                    if (transactionDateInput) transactionDateInput.value = new Date().toISOString().split('T')[0];
-                    if (paymentMethodSelect) paymentMethodSelect.value = 'cash';
-                    if (saleNotesInput) saleNotesInput.value = '';
-                    if (receiptFileInput) receiptFileInput.value = '';
-                    
-                    console.log('🔄 Form and cart reset');
-                    console.log('💰 Transaction data saved to INCOME table');
-                    console.log('📊 Transaction ID:', data.transaction_id);
-                    console.log('💵 Amount:', data.total_amount);
-                    console.log('📝 Type:', data.type);
-                    
-                    // Redirect to transactions page to show the data
-                    setTimeout(() => {
-                        const redirectUrl = '/transactions';
-                        console.log('🔀 Redirecting to transactions page:', redirectUrl);
-                        window.location.href = redirectUrl;
-                    }, 2000);
-                    
-                } else {
-                    console.error('❌ Server returned error:', data.message);
-                    alert(`❌ ERROR: ${data.message || 'Terjadi kesalahan pada server'}`);
-                }
-                
-            } catch (error) {
-                console.error('💥 FETCH ERROR:', error);
-                alert(`❌ ERROR: ${error.message}\n\nSilakan coba lagi atau hubungi admin.`);
-                
-            } finally {
-                // Step 11: Reset button state
-                this.disabled = false;
-                this.innerHTML = originalText;
-                this.classList.remove('opacity-75', 'cursor-not-allowed');
-                console.log('🔄 Button state reset');
-            }
-        });
-        
-        console.log('✅ Checkout event listener attached successfully');
-        
+}
+
+// Add Menu Modal
+function openAddModal() {
+    document.getElementById('addMenuForm').reset();
+    document.getElementById('addUnlimitedStock').checked = true;
+    toggleAddStock();
+    document.getElementById('addModal').classList.add('active');
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').classList.remove('active');
+    document.getElementById('addMenuForm').reset();
+}
+
+// Toggle stok untuk Add Modal
+function toggleAddStock() {
+    const checkbox = document.getElementById('addUnlimitedStock');
+    const stockInput = document.getElementById('addStock');
+    if (checkbox.checked) {
+        stockInput.value = '';
+        stockInput.disabled = true;
+        stockInput.placeholder = 'Tidak terbatas';
     } else {
-        console.error('❌ Missing required elements:', {
-            checkoutBtn: !!checkoutBtn,
-            checkoutForm: !!checkoutForm
-        });
+        stockInput.disabled = false;
+        stockInput.placeholder = 'Jumlah stok';
+        stockInput.focus();
     }
-    // Helper function for number formatting
-    function number_format(number, decimals) {
-        return number.toLocaleString('id-ID', {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals
-        });
+}
+
+// Toggle stok untuk Edit Modal
+function toggleEditStock() {
+    const checkbox = document.getElementById('editUnlimitedStock');
+    const stockInput = document.getElementById('editStock');
+    if (checkbox.checked) {
+        stockInput.value = '';
+        stockInput.disabled = true;
+        stockInput.placeholder = 'Tidak terbatas';
+    } else {
+        stockInput.disabled = false;
+        stockInput.placeholder = 'Jumlah stok';
+        stockInput.focus();
+    }
+}
+
+// Initialize Add Modal stok toggle
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAddStock();
+});
+
+document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    formData.append('_token', '{{ csrf_token() }}');
+    
+    // Handle checkbox is_available
+    if (!e.target.querySelector('[name="is_available"]').checked) {
+        formData.set('is_available', '0');
     }
     
-    // Optional: Recent sales modal function
-    function toggleRecentSales() {
-        // Implementation for recent sales modal
-        console.log('Toggle recent sales modal');
+    // Handle stok tidak terbatas
+    const unlimitedStockChecked = document.getElementById('addUnlimitedStock').checked;
+    if (unlimitedStockChecked) {
+        formData.set('stock', '-1');
+    }
+    
+    try {
+        const res = await fetch('{{ route("menu.store") }}', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: formData
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('✅ Menu berhasil ditambahkan!');
+            location.reload();
+        } else {
+            alert('❌ ' + (data.message || 'Gagal menyimpan'));
+        }
+    } catch (err) {
+        alert('❌ ' + err.message);
     }
 });
+
+// Edit Menu Modal
+async function openEditModal(id) {
+    try {
+        const res = await fetch('/menu/' + id, {
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (!res.ok) {
+            throw new Error('Menu tidak ditemukan');
+        }
+        
+        const menu = await res.json();
+        
+        // Safe value assignment dengan fallback
+        document.getElementById('editId').value = menu.id || '';
+        document.getElementById('editName').value = menu.name || '';
+        document.getElementById('editCategory').value = menu.category || '';
+        document.getElementById('editPrice').value = menu.price || 0;
+        document.getElementById('editDescription').value = menu.description || '';
+        document.getElementById('editAvailable').checked = menu.is_available == 1;
+        
+        // Handle stok - jika -1 berarti tidak terbatas
+        const stockInput = document.getElementById('editStock');
+        const unlimitedCheckbox = document.getElementById('editUnlimitedStock');
+        
+        if (menu.stock === -1 || menu.stock === null || menu.stock === undefined) {
+            unlimitedCheckbox.checked = true;
+            stockInput.value = '';
+            stockInput.disabled = true;
+            stockInput.placeholder = 'Tidak terbatas';
+        } else {
+            unlimitedCheckbox.checked = false;
+            stockInput.value = menu.stock;
+            stockInput.disabled = false;
+            stockInput.placeholder = 'Jumlah stok';
+        }
+        
+        document.getElementById('editModal').classList.add('active');
+    } catch (err) {
+        console.error('Error loading menu:', err);
+        alert('❌ Gagal memuat data menu: ' + err.message);
+    }
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+}
+
+document.getElementById('editMenuForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = document.getElementById('editId').value;
+    const formData = new FormData(e.target);
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('_method', 'PUT');
+    
+    // Handle checkbox is_available
+    if (!e.target.querySelector('[name="is_available"]').checked) {
+        formData.set('is_available', '0');
+    }
+    
+    // Handle stok tidak terbatas
+    const unlimitedStockChecked = document.getElementById('editUnlimitedStock').checked;
+    if (unlimitedStockChecked) {
+        formData.set('stock', '-1');
+    }
+    
+    try {
+        const res = await fetch('/menu/' + id, {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: formData
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('✅ Menu berhasil diupdate!');
+            location.reload();
+        } else {
+            alert('❌ ' + (data.message || 'Gagal update'));
+        }
+    } catch (err) {
+        alert('❌ ' + err.message);
+    }
+});
+
+async function deleteMenu() {
+    if (!confirm('Yakin hapus menu ini?')) return;
+    
+    const id = document.getElementById('editId').value;
+    
+    try {
+        const res = await fetch('/menu/' + id, {
+            method: 'DELETE',
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'Accept': 'application/json' 
+            }
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+            alert('✅ Menu dihapus!');
+            location.reload();
+        } else {
+            alert('❌ ' + (data.message || 'Gagal hapus'));
+        }
+    } catch (err) {
+        alert('❌ ' + err.message);
+    }
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            overlay.classList.remove('active');
+        }
+    });
+});
 </script>
-@endpush
 @endsection

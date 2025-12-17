@@ -11,24 +11,35 @@ class TransactionController extends Controller
     public function index()
     {
         try {
-            // Get all transactions (both income and expense) for the authenticated user
-            $transactions = Auth::user()->transactions()
-                ->with('transactionDetails') // Eager load transaction details
-                ->orderBy('transaction_date', 'desc')
-                ->paginate(10);
+            // Implement caching untuk transaction data
+            $cacheKey = 'transactions_' . auth()->id() . '_' . request('page', 1) . '_' . request('type', 'all');
+            
+            $result = cache()->remember($cacheKey, 180, function () {
+                // Optimasi query dengan select specific columns dan eager loading
+                $transactions = auth()->user()->transactions()
+                    ->select('id', 'transaction_date', 'amount', 'description', 'type', 'payment_method', 'created_at')
+                    ->with(['transactionDetails' => function($query) {
+                        $query->select('id', 'transaction_id', 'menu_name', 'quantity', 'total_price');
+                    }])
+                    ->orderBy('transaction_date', 'desc')
+                    ->paginate(10);
                 
-            // Calculate total income and expense for the summary
-            $totalIncome = Auth::user()->transactions()
-                ->where('type', 'income')
-                ->sum('amount');
+                // Optimasi query untuk summary dengan single query
+                $summary = auth()->user()->transactions()
+                    ->selectRaw('
+                        SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as total_income,
+                        SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as total_expense
+                    ')
+                    ->first();
                 
-            $totalExpense = Auth::user()->transactions()
-                ->where('type', 'expense')
-                ->sum('amount');
+                $totalIncome = $summary->total_income ?? 0;
+                $totalExpense = $summary->total_expense ?? 0;
+                $balance = $totalIncome - $totalExpense;
                 
-            $balance = $totalIncome - $totalExpense;
-                
-            return view('transactions.index', compact('transactions', 'totalIncome', 'totalExpense', 'balance'));
+                return compact('transactions', 'totalIncome', 'totalExpense', 'balance');
+            });
+            
+            return view('transactions.index', $result);
             
         } catch (\Exception $e) {
             // Log the error
@@ -56,7 +67,7 @@ class TransactionController extends Controller
             'Operasional',
             'Marketing',
             'Pajak',
-            'Lain-lain'
+            'Lainnya'
         ];
 
         $incomeCategories = [
@@ -65,7 +76,7 @@ class TransactionController extends Controller
             'Service Charge',
             'Deposit Customer',
             'Sewa Tempat',
-            'Lainnya'
+            'Lain-lain'
         ];
         
         return view('transactions.create', compact('transactionTypes', 'expenseCategories', 'incomeCategories'));
@@ -75,7 +86,7 @@ class TransactionController extends Controller
     {
         $validated = $request->validate([
             'transaction_date' => 'required|date',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric', // Menghapus min:0 untuk mengizinkan nilai negatif
             'description' => 'required|string|max:255',
             'type' => 'required|in:expense,income_other',
             'payment_method' => 'required|string|max:50',
@@ -143,7 +154,7 @@ class TransactionController extends Controller
 
         $validated = $request->validate([
             'transaction_date' => 'required|date',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required|numeric', // Menghapus min:0 untuk mengizinkan nilai negatif
             'description' => 'required|string|max:255',
             'type' => 'required|in:income,expense',
             'payment_method' => 'required|string|max:50',

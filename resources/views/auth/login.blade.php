@@ -77,7 +77,7 @@
         <!-- Links -->
         <div class="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs md:text-sm">
             @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="btn-teh-ghost text-xs">
+                <a href="{{ route('password.request') }}" class="text-teh-jawa-gold hover:text-teh-jawa-gold-dark font-medium transition-colors">
                     Lupa Password?
                 </a>
             @endif
@@ -85,7 +85,7 @@
             <span class="hidden sm:block text-teh-jawa-gray">|</span>
             
             @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="btn-teh-ghost text-xs">
+                <a href="{{ route('register') }}" class="text-teh-jawa-gold hover:text-teh-jawa-gold-dark font-medium transition-colors">
                     Daftar Akun
                 </a>
             @endif
