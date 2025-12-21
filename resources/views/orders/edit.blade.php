@@ -19,7 +19,7 @@
 
             <!-- Menu Selection -->
             <div class="card-teh-luxury p-8">
-                <h2 class="text-xl font-bold text-teh-jawa-black mb-6">📋 Ubah Menu</h2>
+                <h2 class="text-xl font-bold text-teh-jawa-black mb-6">Ubah Menu</h2>
                 
                 <div id="orderItems" class="space-y-4 mb-6">
                     @foreach($order->items as $index => $item)
@@ -60,7 +60,7 @@
 
             <!-- Order Notes -->
             <div class="card-teh-luxury p-8">
-                <h2 class="text-xl font-bold text-teh-jawa-black mb-4">📝 Catatan Pesanan</h2>
+                <h2 class="text-xl font-bold text-teh-jawa-black mb-4">Catatan Pesanan</h2>
                 <textarea name="notes" class="input-teh w-full" rows="3">{{ $order->notes }}</textarea>
             </div>
 

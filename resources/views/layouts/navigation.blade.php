@@ -43,7 +43,7 @@
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center px-4 py-2 bg-gradient-to-r from-teh-jawa-green to-teh-jawa-green-light text-white rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200">
+                    <button @click="open = !open" class="flex items-center px-4 py-2 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200" style="background-color: #8B4513;">
                         <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center mr-3">
                             <span class="text-sm font-bold">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</span>
                         </div>

@@ -18,7 +18,7 @@
 
             <!-- Menu Selection -->
             <div class="card-teh-luxury p-8">
-                <h2 class="text-xl font-bold text-teh-jawa-black mb-6">📋 Pilih Menu</h2>
+                <h2 class="text-xl font-bold text-teh-jawa-black mb-6">Pilih Menu</h2>
                 
                 <div id="orderItems" class="space-y-4 mb-6">
                     <div class="orderItem bg-gray-50 p-4 rounded-lg border-2 border-gray-200">
@@ -58,7 +58,7 @@
 
             <!-- Order Notes -->
             <div class="card-teh-luxury p-8">
-                <h2 class="text-xl font-bold text-teh-jawa-black mb-4">📝 Catatan Pesanan</h2>
+                <h2 class="text-xl font-bold text-teh-jawa-black mb-4">Catatan Pesanan</h2>
                 <textarea name="notes" class="input-teh w-full" rows="3" placeholder="Catatan tambahan untuk pesanan Anda..."></textarea>
             </div>
 

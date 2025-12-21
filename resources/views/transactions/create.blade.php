@@ -149,12 +149,13 @@
                                     class="input-teh w-full appearance-none"
                                     required>
                                 <option value="">Pilih metode pembayaran</option>
-                                <option value="Tunai" {{ old('payment_method') == 'Tunai' ? 'selected' : '' }}>💵 Tunai</option>
-                                <option value="Transfer Bank" {{ old('payment_method') == 'Transfer Bank' ? 'selected' : '' }}>🏦 Transfer Bank</option>
-                                <option value="Kartu Debit" {{ old('payment_method') == 'Kartu Debit' ? 'selected' : '' }}>🏧 Kartu Debit</option>
-                                <option value="E-Wallet" {{ old('payment_method') == 'E-Wallet' ? 'selected' : '' }}>📱 E-Wallet</option>
-                                <option value="Kredit" {{ old('payment_method') == 'Kredit' ? 'selected' : '' }}>💳 Kredit</option>
-                                <option value="Lainnya" {{ old('payment_method') == 'Lainnya' ? 'selected' : '' }}>➕ Lainnya</option>
+                                <option value="Tunai" {{ old('payment_method') == 'Tunai' ? 'selected' : '' }}>Tunai</option>
+                                <option value="QRIS" {{ old('payment_method') == 'QRIS' ? 'selected' : '' }}>QRIS</option>
+                                <option value="Transfer Bank" {{ old('payment_method') == 'Transfer Bank' ? 'selected' : '' }}>Transfer Bank</option>
+                                <option value="Kartu Debit" {{ old('payment_method') == 'Kartu Debit' ? 'selected' : '' }}>Kartu Debit</option>
+                                <option value="E-Wallet" {{ old('payment_method') == 'E-Wallet' ? 'selected' : '' }}>E-Wallet</option>
+                                <option value="Kredit" {{ old('payment_method') == 'Kredit' ? 'selected' : '' }}>Kredit</option>
+                                <option value="Lainnya" {{ old('payment_method') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <svg class="icon-sm text-teh-jawa-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">

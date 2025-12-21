@@ -30,7 +30,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <label class="relative">
-                            <input type="radio" name="category" value="income" class="peer sr-only" {{ old('category', $transaction->category) == 'income' ? 'checked' : '' }}>
+                            <input type="radio" name="type" value="income" class="peer sr-only" {{ old('type', $transaction->type) == 'income' ? 'checked' : '' }}>
                             <div class="p-5 rounded-lg border-2 border-gray-200 cursor-pointer transition-all duration-200 peer-checked:border-teh-jawa-green peer-checked:bg-teh-jawa-green/5 peer-checked:shadow-lg hover:border-teh-jawa-green/50">
                                 <div class="flex items-center gap-3">
                                     <div class="bg-teh-jawa-green/20 p-3 rounded-lg">
@@ -47,7 +47,7 @@
                         </label>
                         
                         <label class="relative">
-                            <input type="radio" name="category" value="expense" class="peer sr-only" {{ old('category', $transaction->category) == 'expense' ? 'checked' : '' }}>
+                            <input type="radio" name="type" value="expense" class="peer sr-only" {{ old('type', $transaction->type) == 'expense' ? 'checked' : '' }}>
                             <div class="p-5 rounded-lg border-2 border-gray-200 cursor-pointer transition-all duration-200 peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:shadow-lg hover:border-red-300">
                                 <div class="flex items-center gap-3">
                                     <div class="bg-red-100 p-3 rounded-lg">
@@ -63,7 +63,7 @@
                             </div>
                         </label>
                     </div>
-                    @error('category')
+                    @error('type')
                         <p class="text-red-500 text-sm mt-3 flex items-center gap-2">
                             <svg class="icon-sm" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
@@ -150,11 +150,12 @@
                                     class="input-teh w-full appearance-none"
                                     required>
                                 <option value="">Pilih metode pembayaran</option>
-                                <option value="Tunai" {{ old('payment_method', $transaction->payment_method) == 'Tunai' ? 'selected' : '' }}>💵 Tunai</option>
-                                <option value="Transfer Bank" {{ old('payment_method', $transaction->payment_method) == 'Transfer Bank' ? 'selected' : '' }}>🏦 Transfer Bank</option>
-                                <option value="Kartu Debit" {{ old('payment_method', $transaction->payment_method) == 'Kartu Debit' ? 'selected' : '' }}>🏧 Kartu Debit</option>
-                                <option value="E-Wallet" {{ old('payment_method', $transaction->payment_method) == 'E-Wallet' ? 'selected' : '' }}>📱 E-Wallet</option>
-                                <option value="Lainnya" {{ old('payment_method', $transaction->payment_method) == 'Lainnya' ? 'selected' : '' }}>➕ Lainnya</option>
+                                <option value="Tunai" {{ old('payment_method', $transaction->payment_method) == 'Tunai' ? 'selected' : '' }}>Tunai</option>
+                                <option value="QRIS" {{ old('payment_method', $transaction->payment_method) == 'QRIS' ? 'selected' : '' }}>QRIS</option>
+                                <option value="Transfer Bank" {{ old('payment_method', $transaction->payment_method) == 'Transfer Bank' ? 'selected' : '' }}>Transfer Bank</option>
+                                <option value="Kartu Debit" {{ old('payment_method', $transaction->payment_method) == 'Kartu Debit' ? 'selected' : '' }}>Kartu Debit</option>
+                                <option value="E-Wallet" {{ old('payment_method', $transaction->payment_method) == 'E-Wallet' ? 'selected' : '' }}>E-Wallet</option>
+                                <option value="Lainnya" {{ old('payment_method', $transaction->payment_method) == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
                             </select>
                             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                                 <svg class="icon-sm text-teh-jawa-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">

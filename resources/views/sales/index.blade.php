@@ -361,69 +361,109 @@
 
 /* Right Panel - Cart */
 .pos-right {
-    width: 400px;
+    width: 480px;
     background: white;
     border-left: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
+    height: calc(100vh - 64px);
 }
 
 .cart-header {
-    padding: 20px;
+    padding: 10px 14px;
     background: linear-gradient(135deg, var(--tj-brown) 0%, #6d3710 100%);
     color: white;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .cart-header h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
     margin: 0;
 }
 
 .cart-header p {
-    font-size: 13px;
-    opacity: 0.7;
-    margin: 4px 0 0 0;
+    font-size: 11px;
+    opacity: 0.9;
+    margin: 0;
+    background: rgba(255,255,255,0.2);
+    padding: 2px 8px;
+    border-radius: 10px;
 }
 
 .cart-items {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
+    padding: 12px;
+    background: #fafafa;
 }
 
 .cart-empty {
     text-align: center;
-    padding: 60px 20px;
+    padding: 40px 20px;
     color: #94a3b8;
 }
 
-.cart-item {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 14px;
+.cart-empty svg {
+    width: 48px;
+    height: 48px;
     margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.cart-item {
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.cart-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    border-color: var(--tj-gold);
+}
+
+.cart-item:last-child {
+    margin-bottom: 0;
 }
 
 .cart-item-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
 
 .cart-item-name {
     font-weight: 600;
     color: #1e293b;
-    font-size: 14px;
+    font-size: 13px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px;
 }
 
 .cart-item-remove {
     color: #ef4444;
-    background: none;
+    background: #fef2f2;
     border: none;
     cursor: pointer;
-    padding: 4px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    transition: all 0.15s;
+}
+
+.cart-item-remove:hover {
+    background: #fee2e2;
 }
 
 .cart-item-details {
@@ -435,36 +475,50 @@
 .cart-item-qty {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: white;
-    border-radius: 8px;
-    padding: 4px;
+    gap: 4px;
+    background: #f8fafc;
+    border-radius: 6px;
+    padding: 2px;
+    border: 1px solid #e2e8f0;
 }
 
 .cart-item-qty button {
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border: none;
-    background: #f1f5f9;
-    border-radius: 6px;
+    background: white;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    transition: all 0.15s;
+}
+
+.cart-item-qty button:hover {
+    background: var(--tj-gold);
+    color: white;
 }
 
 .cart-item-qty span {
-    width: 24px;
+    width: 28px;
     text-align: center;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 13px;
+    color: #1e293b;
 }
 
 .cart-item-total {
     font-weight: 700;
-    color: #1e293b;
+    color: var(--tj-gold);
+    font-size: 14px;
 }
 
 .cart-footer {
-    padding: 20px;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
+    padding: 14px;
+    border-top: 2px solid #e2e8f0;
+    background: white;
+    flex-shrink: 0;
 }
 
 .cart-total {
@@ -478,6 +532,157 @@
 
 .cart-total span:last-child {
     color: var(--tj-gold);
+}
+
+/* Payment Section - Collapsible */
+.payment-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.payment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, var(--tj-gold) 0%, var(--tj-brown) 100%);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+}
+
+.payment-header:hover {
+    opacity: 0.95;
+}
+
+.payment-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+}
+
+.payment-header-left span {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.payment-header-total {
+    font-weight: 700;
+    font-size: 16px;
+    color: white;
+}
+
+.payment-toggle {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: transform 0.3s ease;
+}
+
+.payment-toggle.collapsed {
+    transform: rotate(180deg);
+}
+
+.payment-body {
+    padding: 12px;
+    max-height: 300px;
+    transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+    opacity: 1;
+}
+
+.payment-body.collapsed {
+    max-height: 0;
+    padding: 0 12px;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.payment-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.payment-row:last-child {
+    margin-bottom: 0;
+}
+
+.payment-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+}
+
+.payment-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.payment-value.total {
+    font-size: 20px;
+    color: var(--tj-gold);
+}
+
+.payment-value.rounded {
+    font-size: 18px;
+    color: var(--tj-brown);
+}
+
+.payment-value.change {
+    font-size: 18px;
+    color: var(--tj-green);
+}
+
+.payment-value.change.negative {
+    color: #ef4444;
+}
+
+.payment-input-wrapper {
+    position: relative;
+    flex: 0 0 160px;
+}
+
+.payment-input-wrapper span {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 600;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.payment-input {
+    width: 100%;
+    height: 42px;
+    padding: 0 12px 0 40px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: right;
+    transition: all 0.2s;
+}
+
+.payment-input:focus {
+    outline: none;
+    border-color: var(--tj-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.payment-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e2e8f0, transparent);
+    margin: 12px 0;
 }
 
 .cart-form {
@@ -667,6 +872,7 @@
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
+    margin-top: 12px;
 }
 
 .form-checkbox:hover {
@@ -841,7 +1047,7 @@
     <!-- Right Panel - Cart -->
     <div class="pos-right">
         <div class="cart-header">
-            <h2>🛒 Keranjang</h2>
+            <h2>Keranjang</h2>
             <p id="cartCount">0 item</p>
         </div>
 
@@ -853,14 +1059,52 @@
         </div>
 
         <div class="cart-footer">
-            <div class="cart-total">
-                <span>Total</span>
-                <span id="cartTotal">Rp 0</span>
+            <!-- Payment Section - Collapsible -->
+            <div class="payment-section">
+                <div class="payment-header" onclick="togglePaymentSection()">
+                    <div class="payment-header-left">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        <span>Pembayaran</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="payment-header-total" id="paymentHeaderTotal">Rp 0</span>
+                        <div class="payment-toggle" id="paymentToggle">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="payment-body" id="paymentBody">
+                    <div class="payment-row">
+                        <span class="payment-label">Subtotal</span>
+                        <span class="payment-value" id="cartSubtotal">Rp 0</span>
+                    </div>
+                    <div class="payment-divider"></div>
+                    <div class="payment-row">
+                        <span class="payment-label">Total Dibayar</span>
+                        <span class="payment-value total" id="cartTotal">Rp 0</span>
+                    </div>
+                    <div class="payment-divider"></div>
+                    <div class="payment-row">
+                        <span class="payment-label">Uang Diterima</span>
+                        <div class="payment-input-wrapper">
+                            <span>Rp</span>
+                            <input type="text" id="cashReceived" class="payment-input" placeholder="0" oninput="calculateChange()">
+                        </div>
+                    </div>
+                    <div class="payment-row">
+                        <span class="payment-label">Kembalian</span>
+                        <span class="payment-value change" id="changeAmount">Rp 0</span>
+                    </div>
+                </div>
             </div>
 
             <form id="checkoutForm" class="cart-form" enctype="multipart/form-data">
                 <input type="date" name="transaction_date" value="{{ date('Y-m-d') }}" required>
-                <select name="payment_method" required>
+                <select name="payment_method" required onchange="toggleCashInput()">
                     <option value="">Metode Pembayaran</option>
                     <option value="Tunai">Tunai</option>
                     <option value="QRIS">QRIS</option>
@@ -896,8 +1140,8 @@
 <div class="modal-overlay" id="addModal">
     <div class="modal">
         <div class="modal-header">
-            <h3>➕ Tambah Menu Baru</h3>
-            <button class="modal-close" onclick="closeAddModal()">✕</button>
+            <h3>Tambah Menu Baru</h3>
+            <button class="modal-close" onclick="closeAddModal()">&times;</button>
         </div>
         <form id="addMenuForm">
             <div class="modal-body">
@@ -945,7 +1189,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-cancel" onclick="closeAddModal()">Batal</button>
-                <button type="submit" class="btn-submit">💾 Simpan Menu</button>
+                <button type="submit" class="btn-submit">Simpan Menu</button>
             </div>
         </form>
     </div>
@@ -955,8 +1199,8 @@
 <div class="modal-overlay" id="editModal">
     <div class="modal">
         <div class="modal-header edit">
-            <h3>✏️ Edit Menu</h3>
-            <button class="modal-close" onclick="closeEditModal()">✕</button>
+            <h3>Edit Menu</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
         </div>
         <form id="editMenuForm">
             <input type="hidden" name="id" id="editId">
@@ -1004,9 +1248,9 @@
                 </label>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-delete" onclick="deleteMenu()">🗑️ Hapus</button>
+                <button type="button" class="btn-delete" onclick="deleteMenu()">Hapus</button>
                 <button type="button" class="btn-cancel" onclick="closeEditModal()">Batal</button>
-                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">💾 Update</button>
+                <button type="submit" class="btn-submit" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">Update</button>
             </div>
         </form>
     </div>
@@ -1017,9 +1261,97 @@
 let cart = [];
 let selectedItem = null;
 let selectedQty = 1;
+let currentTotal = 0; // Total yang sudah dibulatkan
+let isPaymentCollapsed = false; // State untuk collapse payment section
 
-// Format
+// Format number with thousand separator
 function formatRp(n) { return new Intl.NumberFormat('id-ID').format(n); }
+
+// Parse formatted number back to integer
+function parseRp(str) {
+    if (!str) return 0;
+    return parseInt(str.toString().replace(/\D/g, '')) || 0;
+}
+
+// Pembulatan otomatis: < 50 bulatkan ke bawah, >= 50 bulatkan ke atas
+function roundTo100(amount) {
+    const remainder = amount % 100;
+    if (remainder === 0) return amount;
+    if (remainder < 50) {
+        return amount - remainder; // Round down
+    } else {
+        return amount + (100 - remainder); // Round up
+    }
+}
+
+// Calculate change (kembalian)
+function calculateChange() {
+    const cashInput = document.getElementById('cashReceived');
+    const changeEl = document.getElementById('changeAmount');
+    
+    // Parse the input (remove non-numeric characters)
+    const cashReceived = parseRp(cashInput.value);
+    
+    // Format the input with thousand separator
+    if (cashInput.value !== '') {
+        cashInput.value = formatRp(cashReceived);
+    }
+    
+    const change = cashReceived - currentTotal;
+    
+    if (cashReceived === 0 || cashInput.value === '') {
+        changeEl.textContent = 'Rp 0';
+        changeEl.classList.remove('negative');
+    } else if (change >= 0) {
+        changeEl.textContent = 'Rp ' + formatRp(change);
+        changeEl.classList.remove('negative');
+    } else {
+        changeEl.textContent = '- Rp ' + formatRp(Math.abs(change));
+        changeEl.classList.add('negative');
+    }
+}
+
+// Toggle cash input visibility based on payment method
+function toggleCashInput() {
+    const paymentMethod = document.querySelector('select[name="payment_method"]').value;
+    const cashInput = document.getElementById('cashReceived');
+    const isCash = paymentMethod === 'Tunai';
+    
+    // Always visible but highlight for cash payment
+    if (isCash) {
+        cashInput.focus();
+    }
+}
+
+// Toggle payment section collapse/expand
+function togglePaymentSection() {
+    isPaymentCollapsed = !isPaymentCollapsed;
+    const body = document.getElementById('paymentBody');
+    const toggle = document.getElementById('paymentToggle');
+    
+    if (isPaymentCollapsed) {
+        body.classList.add('collapsed');
+        toggle.classList.add('collapsed');
+    } else {
+        body.classList.remove('collapsed');
+        toggle.classList.remove('collapsed');
+    }
+}
+
+// Auto collapse payment when cart has items
+function autoCollapsePayment(hasItems) {
+    if (hasItems && !isPaymentCollapsed) {
+        // Collapse when items added
+        isPaymentCollapsed = true;
+        document.getElementById('paymentBody').classList.add('collapsed');
+        document.getElementById('paymentToggle').classList.add('collapsed');
+    } else if (!hasItems && isPaymentCollapsed) {
+        // Expand when cart is empty
+        isPaymentCollapsed = false;
+        document.getElementById('paymentBody').classList.remove('collapsed');
+        document.getElementById('paymentToggle').classList.remove('collapsed');
+    }
+}
 
 // Receipt file handler
 document.getElementById('receiptInput').addEventListener('change', function(e) {
@@ -1124,18 +1456,31 @@ function renderCart() {
     const container = document.getElementById('cartItems');
     
     if (cart.length === 0) {
-        container.innerHTML = '<div class="cart-empty"><p>Keranjang kosong</p><p style="font-size: 13px;">Pilih menu untuk menambahkan</p></div>';
+        container.innerHTML = `
+            <div class="cart-empty">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                <p style="font-weight: 600; margin-bottom: 4px;">Keranjang kosong</p>
+                <p style="font-size: 12px;">Pilih menu untuk menambahkan</p>
+            </div>`;
         document.getElementById('cartCount').textContent = '0 item';
+        document.getElementById('cartSubtotal').textContent = 'Rp 0';
         document.getElementById('cartTotal').textContent = 'Rp 0';
+        document.getElementById('paymentHeaderTotal').textContent = 'Rp 0';
+        document.getElementById('cashReceived').value = '';
+        document.getElementById('changeAmount').textContent = 'Rp 0';
+        currentTotal = 0;
+        autoCollapsePayment(false); // Expand when empty
         return;
     }
     
     let html = '';
-    let total = 0;
+    let subtotal = 0;
     
     cart.forEach((item, i) => {
-        const subtotal = item.price * item.qty;
-        total += subtotal;
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
         const itemName = item.name || 'Menu';
         html += `
         <div class="cart-item">
@@ -1149,14 +1494,26 @@ function renderCart() {
                     <span>${item.qty}</span>
                     <button type="button" onclick="updateQty(${i}, 1)">+</button>
                 </div>
-                <span class="cart-item-total">Rp ${formatRp(subtotal)}</span>
+                <span class="cart-item-total">Rp ${formatRp(itemTotal)}</span>
             </div>
         </div>`;
     });
     
+    // Apply rounding
+    const roundedTotal = roundTo100(subtotal);
+    currentTotal = roundedTotal;
+    
     container.innerHTML = html;
     document.getElementById('cartCount').textContent = cart.length + ' item';
-    document.getElementById('cartTotal').textContent = 'Rp ' + formatRp(total);
+    document.getElementById('cartSubtotal').textContent = 'Rp ' + formatRp(subtotal);
+    document.getElementById('cartTotal').textContent = 'Rp ' + formatRp(roundedTotal);
+    document.getElementById('paymentHeaderTotal').textContent = 'Rp ' + formatRp(roundedTotal);
+    
+    // Recalculate change
+    calculateChange();
+    
+    // Auto collapse payment section when items added
+    autoCollapsePayment(true);
 }
 
 function updateQty(i, delta) {
@@ -1202,16 +1559,16 @@ async function checkout() {
         const data = await res.json();
         
         if (data.success) {
-            alert('✅ Transaksi berhasil!\nTotal: Rp ' + formatRp(data.total_amount));
+            showToast('Transaksi berhasil! Total: Rp ' + formatRp(data.total_amount), 'success', 'Transaksi Berhasil');
             cart = [];
             renderCart();
             form.reset();
             form.querySelector('[name="transaction_date"]').value = '{{ date("Y-m-d") }}';
         } else {
-            alert('❌ ' + data.message);
+            showToast(data.message, 'error');
         }
     } catch (err) {
-        alert('❌ Error: ' + err.message);
+        showToast(err.message, 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Proses';
@@ -1293,13 +1650,13 @@ document.getElementById('addMenuForm').addEventListener('submit', async (e) => {
         const data = await res.json();
         
         if (data.success) {
-            alert('✅ Menu berhasil ditambahkan!');
+            showToast('Menu berhasil ditambahkan!', 'success', 'Menu Baru');
             location.reload();
         } else {
-            alert('❌ ' + (data.message || 'Gagal menyimpan'));
+            showToast(data.message || 'Gagal menyimpan', 'error');
         }
     } catch (err) {
-        alert('❌ ' + err.message);
+        showToast(err.message, 'error');
     }
 });
 
@@ -1343,7 +1700,7 @@ async function openEditModal(id) {
         document.getElementById('editModal').classList.add('active');
     } catch (err) {
         console.error('Error loading menu:', err);
-        alert('❌ Gagal memuat data menu: ' + err.message);
+        showToast('Gagal memuat data menu: ' + err.message, 'error');
     }
 }
 
@@ -1380,13 +1737,13 @@ document.getElementById('editMenuForm').addEventListener('submit', async (e) => 
         const data = await res.json();
         
         if (data.success) {
-            alert('✅ Menu berhasil diupdate!');
+            showToast('Menu berhasil diupdate!', 'success', 'Update Menu');
             location.reload();
         } else {
-            alert('❌ ' + (data.message || 'Gagal update'));
+            showToast(data.message || 'Gagal update', 'error');
         }
     } catch (err) {
-        alert('❌ ' + err.message);
+        showToast(err.message, 'error');
     }
 });
 
@@ -1407,13 +1764,13 @@ async function deleteMenu() {
         const data = await res.json();
         
         if (data.success) {
-            alert('✅ Menu dihapus!');
+            showToast('Menu berhasil dihapus!', 'success', 'Hapus Menu');
             location.reload();
         } else {
-            alert('❌ ' + (data.message || 'Gagal hapus'));
+            showToast(data.message || 'Gagal hapus', 'error');
         }
     } catch (err) {
-        alert('❌ ' + err.message);
+        showToast(err.message, 'error');
     }
 }
 

@@ -152,7 +152,7 @@ class SalesController extends Controller
                 'transaction_date' => $validated['transaction_date'],
                 'amount' => $totalAmount,
                 'description' => $description,
-                'type' => 'income_other', // Transaksi Lain - Pemasukan
+                'type' => 'income', // Penjualan Menu - Pemasukan
                 'payment_method' => $validated['payment_method'],
                 'receipt_path' => $receiptPath,
                 'receipt_filename' => $receiptFilename,
@@ -185,7 +185,7 @@ class SalesController extends Controller
                     'message' => "Transaksi lain berhasil disimpan ke pemasukan!",
                     'transaction_id' => $transaction->id,
                     'total_amount' => $totalAmount,
-                    'type' => 'income_other',
+                    'type' => 'income',
                     'description' => $description,
                     'transaction_date' => $transaction->transaction_date,
                     'payment_method' => $transaction->payment_method

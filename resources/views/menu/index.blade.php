@@ -7,7 +7,7 @@
         <!-- Header -->
         <div class="mb-8 flex justify-between items-start">
             <div>
-                <h1 class="text-4xl font-bold text-teh-jawa-black mb-2">📋 Menu</h1>
+                <h1 class="text-4xl font-bold text-teh-jawa-black mb-2">Menu</h1>
                 <p class="text-teh-jawa-gray">Pilih dan kelola menu makanan Teh Jawa</p>
             </div>
             @can('create-menu')
