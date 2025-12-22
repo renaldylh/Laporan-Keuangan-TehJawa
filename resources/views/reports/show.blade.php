@@ -27,19 +27,19 @@
             <!-- Income Card -->
             <div class="bg-white rounded-lg shadow-sm border-l-4 border-green-500 p-4">
                 <p class="text-xs font-medium text-gray-500 uppercase">Pemasukan</p>
-                <p class="text-lg md:text-xl font-bold text-green-600 mt-1">Rp {{ number_format($report->total_income, 0) }}</p>
+                <p class="text-lg md:text-xl font-bold text-green-600 mt-1">Rp {{ number_format($report->total_income, 0, ',', '.') }}</p>
             </div>
 
             <!-- Expense Card -->
             <div class="bg-white rounded-lg shadow-sm border-l-4 border-red-500 p-4">
                 <p class="text-xs font-medium text-gray-500 uppercase">Pengeluaran</p>
-                <p class="text-lg md:text-xl font-bold text-red-600 mt-1">Rp {{ number_format($report->total_expense, 0) }}</p>
+                <p class="text-lg md:text-xl font-bold text-red-600 mt-1">Rp {{ number_format($report->total_expense, 0, ',', '.') }}</p>
             </div>
 
             <!-- Profit/Loss Card -->
             <div class="bg-white rounded-lg shadow-sm border-l-4 {{ $report->profit >= 0 ? 'border-teh-jawa-gold' : 'border-red-500' }} p-4">
                 <p class="text-xs font-medium text-gray-500 uppercase">Laba/Rugi</p>
-                <p class="text-lg md:text-xl font-bold {{ $report->profit >= 0 ? 'text-teh-jawa-gold' : 'text-red-600' }} mt-1">Rp {{ number_format($report->profit, 0) }}</p>
+                <p class="text-lg md:text-xl font-bold {{ $report->profit >= 0 ? 'text-teh-jawa-gold' : 'text-red-600' }} mt-1">Rp {{ number_format($report->profit, 0, ',', '.') }}</p>
             </div>
         </div>
 
@@ -62,7 +62,7 @@
             </div>
             <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-purple-500">
                 <p class="text-xs font-medium text-gray-500 uppercase">Rata-rata</p>
-                <p class="text-lg font-bold text-purple-600">Rp {{ number_format($avgTransactionValue, 0) }}</p>
+                <p class="text-lg font-bold text-purple-600">Rp {{ number_format($avgTransactionValue, 0, ',', '.') }}</p>
                 <p class="text-xs text-gray-400">Per transaksi</p>
             </div>
             <div class="bg-white rounded-lg shadow-sm p-4 border-l-4 border-orange-500">
@@ -91,7 +91,7 @@
                 </p>
                 <p class="text-xs text-gray-400">
                     @if($expenseDetails->isNotEmpty())
-                        Rp {{ number_format($expenseDetails->sortByDesc('total_amount')->first()['total_amount'], 0) }}
+                        Rp {{ number_format($expenseDetails->sortByDesc('total_amount')->first()['total_amount'], 0, ',', '.') }}
                     @endif
                 </p>
             </div>
@@ -119,7 +119,7 @@
                                         <p class="text-xs text-gray-500">{{ $detail['quantity'] }} item</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-semibold text-green-600">Rp {{ number_format($detail['total_amount'], 0) }}</p>
+                                        <p class="text-sm font-semibold text-green-600">Rp {{ number_format($detail['total_amount'], 0, ',', '.') }}</p>
                                         <p class="text-xs text-gray-400">{{ round(($detail['total_amount'] / max($totalIncome, 1)) * 100, 1) }}%</p>
                                     </div>
                                 </div>
@@ -153,7 +153,7 @@
                                         <p class="text-xs text-gray-500">{{ $detail['count'] }} transaksi</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-semibold text-red-600">Rp {{ number_format($detail['total_amount'], 0) }}</p>
+                                        <p class="text-sm font-semibold text-red-600">Rp {{ number_format($detail['total_amount'], 0, ',', '.') }}</p>
                                         <p class="text-xs text-gray-400">{{ round(($detail['total_amount'] / max($totalExpense, 1)) * 100, 1) }}%</p>
                                     </div>
                                 </div>
@@ -203,7 +203,7 @@
                             </div>
                             <div class="text-right ml-4 flex-shrink-0">
                                 <p class="text-sm font-semibold {{ $transaction->type == 'income' || $transaction->type == 'income_other' ? 'text-green-600' : 'text-red-600' }}">
-                                    {{ $transaction->type == 'income' || $transaction->type == 'income_other' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0) }}
+                                    {{ $transaction->type == 'income' || $transaction->type == 'income_other' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                                 </p>
                                 <span class="inline-block px-2 py-0.5 rounded text-xs font-medium {{ $transaction->type == 'income' || $transaction->type == 'income_other' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }} mt-1">
                                     {{ $transaction->type == 'income' || $transaction->type == 'income_other' ? 'Masuk' : 'Keluar' }}

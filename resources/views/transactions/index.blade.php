@@ -89,7 +89,7 @@
                                 </span>
                             </td>
                             <td class="text-right text-xs md:text-sm font-semibold {{ $transaction->type == 'income' ? 'text-teh-jawa-brown' : 'text-red-600' }}">
-                                {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0) }}
+                                {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                             </td>
                             <td class="text-right">
                                 <div class="flex gap-2 justify-end">

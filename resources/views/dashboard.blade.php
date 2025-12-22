@@ -33,7 +33,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-teh-jawa-black mb-1">Rp {{ number_format($monthlyIncome, 0) }}</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-teh-jawa-black mb-1">Rp {{ number_format($monthlyIncome, 0, ',', '.') }}</p>
                         <p class="text-[10px] sm:text-xs text-teh-jawa-gray">{{ $monthlyIncome > 0 ? round(($monthlyIncome / ($monthlyIncome + $monthlyExpense)) * 100, 0) : 0 }}% dari total</p>
                     </div>
                 </a>
@@ -49,7 +49,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-teh-jawa-black mb-1">Rp {{ number_format($monthlyExpense, 0) }}</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-teh-jawa-black mb-1">Rp {{ number_format($monthlyExpense, 0, ',', '.') }}</p>
                         <p class="text-[10px] sm:text-xs text-teh-jawa-gray">{{ $monthlyExpense > 0 ? round(($monthlyExpense / ($monthlyIncome + $monthlyExpense)) * 100, 0) : 0 }}% dari total</p>
                     </div>
                 </a>
@@ -65,7 +65,7 @@
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-xl sm:text-2xl md:text-3xl font-bold {{ $monthlyProfit >= 0 ? 'text-teh-jawa-gold' : 'text-red-600' }} mb-1">Rp {{ number_format($monthlyProfit, 0) }}</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold {{ $monthlyProfit >= 0 ? 'text-teh-jawa-gold' : 'text-red-600' }} mb-1">Rp {{ number_format($monthlyProfit, 0, ',', '.') }}</p>
                         <p class="text-[10px] sm:text-xs text-teh-jawa-gray">{{ $monthlyIncome > 0 ? round(($monthlyProfit/$monthlyIncome)*100, 0) : 0 }}% margin keuntungan</p>
                     </div>
                 </a>
@@ -141,7 +141,7 @@
                                         </td>
                                         <td class="py-3 px-4 text-right">
                                             <span class="font-mono font-bold {{ $transaction->type === 'income' ? 'text-teh-jawa-green' : 'text-red-600' }}">
-                                                {{ $transaction->type === 'income' ? '+' : '-' }} Rp {{ number_format($transaction->amount, 0) }}
+                                                {{ $transaction->type === 'income' ? '+' : '-' }} Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                                             </span>
                                         </td>
                                     </tr>
@@ -203,7 +203,7 @@
                                         </td>
                                         <td class="py-3 px-4 text-right">
                                             <span class="font-mono font-bold {{ $report->profit >= 0 ? 'text-teh-jawa-gold' : 'text-red-600' }}">
-                                                Rp {{ number_format($report->profit, 0) }}
+                                                Rp {{ number_format($report->profit, 0, ',', '.') }}
                                             </span>
                                         </td>
                                     </tr>

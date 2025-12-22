@@ -35,7 +35,7 @@
                 <div>
                     <label class="text-sm font-semibold text-teh-jawa-gray uppercase tracking-wide">Jumlah</label>
                     <p class="text-3xl font-bold {{ $transaction->category == 'income' ? 'text-teh-jawa-green' : 'text-red-600' }} mt-2">
-                        {{ $transaction->category == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0) }}
+                        {{ $transaction->category == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                     </p>
                 </div>
 

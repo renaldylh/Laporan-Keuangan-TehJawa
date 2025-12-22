@@ -20,7 +20,7 @@ class HomeController extends Controller
             // Implement caching untuk dashboard data (10 min cache)
             $cacheKey = 'dashboard_' . auth()->id() . '_' . now()->format('Y-m-d_H');
             
-            $dashboardData = cache()->remember($cacheKey, 600, function () {
+            $dashboardData = cache()->remember($cacheKey, 60, function () {
                 // Pastikan user ada dan authenticated
                 if (!auth()->check()) {
                     return $this->getEmptyDashboardData();

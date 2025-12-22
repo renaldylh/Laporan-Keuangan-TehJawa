@@ -57,17 +57,17 @@
                             </td>
                             <td class="text-right">
                                 <span class="inline-block px-2 py-1 md:px-3 md:py-1 rounded-lg text-xs md:text-sm font-semibold bg-teh-jawa-green/10 text-teh-jawa-green">
-                                    Rp {{ number_format($report->total_income, 0) }}
+                                    Rp {{ number_format($report->total_income, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td class="text-right">
                                 <span class="inline-block px-2 py-1 md:px-3 md:py-1 rounded-lg text-xs md:text-sm font-semibold bg-red-100 text-red-700">
-                                    Rp {{ number_format($report->total_expense, 0) }}
+                                    Rp {{ number_format($report->total_expense, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td class="text-right">
                                 <span class="inline-block px-2 py-1 md:px-3 md:py-1 rounded-lg text-xs md:text-sm font-semibold {{ $report->profit >= 0 ? 'bg-teh-jawa-gold/10 text-teh-jawa-gold' : 'bg-red-100 text-red-700' }}">
-                                    Rp {{ number_format($report->profit, 0) }}
+                                    Rp {{ number_format($report->profit, 0, ',', '.') }}
                                 </span>
                             </td>
                             <td class="text-right">
