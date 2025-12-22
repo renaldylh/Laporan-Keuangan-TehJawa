@@ -1,61 +1,75 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Laporan Keuangan Teh Jawa
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Deskripsi Sistem
 
-## About Laravel
+Sistem Laporan Keuangan Teh Jawa adalah sebuah aplikasi berbasis web yang dikembangkan untuk memfasilitasi pengelolaan dan pelaporan data keuangan secara efisien, akurat, dan terstruktur. Aplikasi ini dirancang untuk memenuhi kebutuhan pencatatan transaksi, pemantauan arus kas, serta penyusunan laporan keuangan yang komprehensif guna mendukung pengambilan keputusan strategis perusahaan.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Dibangun di atas kerangka kerja Laravel yang modern dan robust, aplikasi ini menawarkan performa tinggi, keamanan data yang terjamin, serta antarmuka pengguna yang intuitif dan responsif.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Arsitektur Sistem
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Aplikasi ini menerapkan pola arsitektur perangkat lunak **Model-View-Controller (MVC)** yang memisahkan logika aplikasi menjadi tiga komponen utama yang saling berinteraksi:
 
-## Learning Laravel
+*   **Model**: Bertanggung jawab untuk pengelolaan data dan aturan bisnis. Komponen ini berinteraksi langsung dengan basis data menggunakan Eloquent ORM, memastikan integritas dan relasi data terjaga dengan baik.
+*   **View**: Menangani representasi visual dan interaksi pengguna. Antarmuka dibangun menggunakan Blade Templating Engine yang dipadukan dengan Tailwind CSS untuk menghasilkan desain yang estetis dan responsif di berbagai perangkat.
+*   **Controller**: Bertindak sebagai penghubung antara Model dan View. Komponen ini menerima input dari pengguna, memproses logika bisnis melalui Model, dan mengembalikan respons yang sesuai ke View.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Struktur ini memastikan kode program yang rapi, mudah dipelihara, dan skalabilitas (scalability) yang baik untuk pengembangan di masa mendatang.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Teknologi yang Digunakan
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Pengembangan sistem ini memanfaatkan serangkaian teknologi terkini untuk menjamin kualitas dan performa aplikasi:
 
-## Laravel Sponsors
+*   **Backend Framework**: Laravel 12 (PHP Framework)
+*   **Bahasa Pemrograman**: PHP 8.2
+*   **Basis Data**: MySQL
+*   **Frontend**: Blade Templates, Tailwind CSS
+*   **Generasi Dokumen**: Laravel Dompdf (untuk pembuatan laporan PDF)
+*   **Build Tool**: Vite
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Fitur Utama
 
-### Premium Partners
+Sistem ini dilengkapi dengan berbagai fitur esensial untuk manajemen keuangan:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+*   **Otentikasi Pengguna**: Sistem login yang aman untuk membatasi akses hanya kepada pengguna yang berwenang.
+*   **Manajemen Laporan Keuangan**: Fitur pencatatan dan pengelolaan data keuangan yang terpusat.
+*   **Ekspor PDF**: Kemampuan untuk mencetak laporan keuangan dalam format PDF menggunakan integrasi `dompdf`, memudahkan proses pengarsipan dan pelaporan fisik.
+*   **Manajemen Data (CRUD)**: Fungsionalitas lengkap untuk Membuat, Membaca, Memperbarui, dan Menghapus data transaksi.
 
-## Contributing
+## Panduan Instalasi dan Konfigurasi
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi ini di lingkungan lokal Anda:
 
-## Code of Conduct
+1.  **Persiapan Lingkungan**: Pastikan PHP 8.2 dan Composer telah terinstal di komputer Anda.
+2.  **Instalasi Dependensi Backend**: Jalankan perintah berikut untuk mengunduh pustaka PHP yang dibutuhkan:
+    ```bash
+    composer install
+    ```
+3.  **Instalasi Dependensi Frontend**: Jalankan perintah berikut untuk menginstal dependensi JavaScript dan membangun aset statis:
+    ```bash
+    npm install
+    npm run build
+    ```
+4.  **Konfigurasi Lingkungan**: Salin file konfigurasi `.env.example` menjadi `.env`:
+    ```bash
+    cp .env.example .env
+    ```
+    Sesuaikan pengaturan basis data (DB_DATABASE, DB_USERNAME, DB_PASSWORD) di dalam file `.env`.
+5.  **Generate Application Key**:
+    ```bash
+    php artisan key:generate
+    ```
+6.  **Migrasi Basis Data**: Jalankan migrasi untuk membuat tabel-tabel yang diperlukan di basis data:
+    ```bash
+    php artisan migrate
+    ```
+7.  **Menjalankan Server**: Aktifkan server pengembangan lokal:
+    ```bash
+    php artisan serve
+    ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Aplikasi kini dapat diakses melalui peramban web di alamat lokal yang tertera (biasanya `http://127.0.0.1:8000`).
 
-## Security Vulnerabilities
+## Lisensi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Aplikasi ini merupakan perangkat lunak sumber terbuka (open-source) yang didistribusikan di bawah lisensi **MIT License**.
