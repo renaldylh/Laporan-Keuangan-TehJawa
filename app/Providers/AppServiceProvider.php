@@ -30,15 +30,15 @@ class AppServiceProvider extends ServiceProvider
 
         // Menu gates
         Gate::define('create-menu', function ($user) {
-            return $user->role === 'owner';
+            return true;
         });
 
         Gate::define('update-menu', function ($user) {
-            return $user->role === 'owner';
+            return true;
         });
 
         Gate::define('delete-menu', function ($user) {
-            return $user->role === 'owner';
+            return true;
         });
         
         if (config('app.env') === 'production') {
