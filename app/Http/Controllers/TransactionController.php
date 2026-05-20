@@ -84,6 +84,14 @@ class TransactionController extends Controller
 
     public function store(Request $request)
     {
+        // Bersihkan data rincian yang kosong agar benar-benar menjadi opsional
+        if ($request->has('details') && is_array($request->input('details'))) {
+            $filteredDetails = array_filter($request->input('details'), function($detail) {
+                return isset($detail['menu_name']) && $detail['menu_name'] !== '';
+            });
+            $request->merge(['details' => !empty($filteredDetails) ? array_values($filteredDetails) : null]);
+        }
+
         $validated = $request->validate([
             'transaction_date' => 'required|date',
             'amount' => 'required|numeric', // Menghapus min:0 untuk mengizinkan nilai negatif
