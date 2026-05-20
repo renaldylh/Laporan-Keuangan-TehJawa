@@ -863,7 +863,7 @@
     margin-top: 4px;
 }
 
-.form-checkbox {
+.form-checkbox-group {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -873,21 +873,24 @@
     cursor: pointer;
     transition: background 0.2s;
     margin-top: 12px;
+    width: 100%;
 }
 
-.form-checkbox:hover {
+.form-checkbox-group:hover {
     background: #f3f4f6;
 }
 
-.form-checkbox input {
+.form-checkbox-group input {
     width: 18px;
     height: 18px;
     accent-color: var(--tj-gold);
+    flex-shrink: 0;
 }
 
-.form-checkbox span {
+.form-checkbox-group span {
     font-size: 13px;
     color: #374151;
+    white-space: nowrap;
 }
 
 .form-stock-row {
@@ -1143,7 +1146,7 @@
             <h3>Tambah Menu Baru</h3>
             <button class="modal-close" onclick="closeAddModal()">&times;</button>
         </div>
-        <form id="addMenuForm">
+        <form id="addMenuForm" autocomplete="off">
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Nama Menu *</label>
@@ -1173,7 +1176,7 @@
                     <div class="form-stock-row">
                         <input type="number" name="stock" id="addStock" class="form-input" placeholder="Jumlah stok" min="0" value="">
                     </div>
-                    <label class="form-checkbox" style="margin-top: 8px;">
+                    <label class="form-checkbox-group" style="margin-top: 8px;">
                         <input type="checkbox" id="addUnlimitedStock" onchange="toggleAddStock()" checked>
                         <span>Stok tidak terbatas</span>
                     </label>
@@ -1182,7 +1185,7 @@
                     <label class="form-label">Gambar</label>
                     <input type="file" name="image" class="form-input" accept="image/*" style="padding: 8px;">
                 </div>
-                <label class="form-checkbox">
+                <label class="form-checkbox-group">
                     <input type="checkbox" name="is_available" value="1" checked>
                     <span>Menu tersedia untuk dijual</span>
                 </label>
@@ -1202,7 +1205,7 @@
             <h3>Edit Menu</h3>
             <button class="modal-close" onclick="closeEditModal()">&times;</button>
         </div>
-        <form id="editMenuForm">
+        <form id="editMenuForm" autocomplete="off">
             <input type="hidden" name="id" id="editId">
             <div class="modal-body">
                 <div class="form-group">
@@ -1233,7 +1236,7 @@
                     <div class="form-stock-row">
                         <input type="number" name="stock" id="editStock" class="form-input" placeholder="Jumlah stok" min="0">
                     </div>
-                    <label class="form-checkbox" style="margin-top: 8px;">
+                    <label class="form-checkbox-group" style="margin-top: 8px;">
                         <input type="checkbox" id="editUnlimitedStock" onchange="toggleEditStock()">
                         <span>Stok tidak terbatas</span>
                     </label>
@@ -1242,7 +1245,7 @@
                     <label class="form-label">Gambar Baru (opsional)</label>
                     <input type="file" name="image" class="form-input" accept="image/*" style="padding: 8px;">
                 </div>
-                <label class="form-checkbox">
+                <label class="form-checkbox-group">
                     <input type="checkbox" name="is_available" id="editAvailable" value="1">
                     <span>Menu tersedia untuk dijual</span>
                 </label>

@@ -23,8 +23,8 @@
                 <div>
                     <label class="text-sm font-semibold text-teh-jawa-gray uppercase tracking-wide">Jenis Transaksi</label>
                     <div class="mt-2">
-                        <span class="inline-block px-4 py-2 rounded-lg text-sm font-semibold {{ $transaction->category == 'income' ? 'bg-teh-jawa-green/10 text-teh-jawa-green' : 'bg-red-100 text-red-700' }}">
-                            {{ $transaction->category == 'income' ? 'Pemasukan' : 'Pengeluaran' }}
+                        <span class="inline-block px-4 py-2 rounded-lg text-sm font-semibold {{ $transaction->type == 'income' ? 'bg-teh-jawa-green/10 text-teh-jawa-green' : 'bg-red-100 text-red-700' }}">
+                            {{ $transaction->type == 'income' ? 'Pemasukan' : 'Pengeluaran' }}
                         </span>
                     </div>
                 </div>
@@ -34,8 +34,8 @@
                 <!-- Amount -->
                 <div>
                     <label class="text-sm font-semibold text-teh-jawa-gray uppercase tracking-wide">Jumlah</label>
-                    <p class="text-3xl font-bold {{ $transaction->category == 'income' ? 'text-teh-jawa-green' : 'text-red-600' }} mt-2">
-                        {{ $transaction->category == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
+                    <p class="text-3xl font-bold {{ $transaction->type == 'income' ? 'text-teh-jawa-green' : 'text-red-600' }} mt-2">
+                        {{ $transaction->type == 'income' ? '+' : '-' }}Rp {{ number_format($transaction->amount, 0, ',', '.') }}
                     </p>
                 </div>
 

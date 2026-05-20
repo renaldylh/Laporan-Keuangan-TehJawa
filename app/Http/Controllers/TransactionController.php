@@ -139,6 +139,8 @@ class TransactionController extends Controller
 
         $message = $validated['type'] === 'income' ? 'Pemasukan berhasil dicatat.' : 'Pengeluaran berhasil dicatat.';
         
+        $this->clearTransactionCache();
+
         return redirect()->route('transactions.index')
             ->with('success', $message);
     }
@@ -170,6 +172,8 @@ class TransactionController extends Controller
 
         $transaction->update($validated);
 
+        $this->clearTransactionCache();
+
         return redirect()->route('transactions.index')
             ->with('success', 'Transaction updated successfully.');
     }
@@ -179,7 +183,25 @@ class TransactionController extends Controller
         $this->authorize('delete', $transaction);
         $transaction->delete();
 
+        $this->clearTransactionCache();
+
         return redirect()->route('transactions.index')
             ->with('success', 'Transaction deleted successfully.');
+    }
+
+    private function clearTransactionCache()
+    {
+        $userId = auth()->id();
+        if (!$userId) return;
+        
+        // Hapus cache daftar transaksi untuk beberapa halaman dan filter tipe
+        for ($page = 1; $page <= 5; $page++) {
+            foreach (['all', 'income', 'expense'] as $type) {
+                cache()->forget("transactions_{$userId}_{$page}_{$type}");
+            }
+        }
+        
+        // Hapus juga cache dashboard karena ringkasan keuangan berubah
+        cache()->forget('dashboard_' . $userId . '_' . now()->format('Y-m-d_H'));
     }
 }
