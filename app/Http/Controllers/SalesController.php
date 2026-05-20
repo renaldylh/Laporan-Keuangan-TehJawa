@@ -236,7 +236,7 @@ class SalesController extends Controller
             'transaction_date' => now(),
             'amount' => $totalPrice,
             'description' => "Transaksi Lain - Quick Sale: {$menuItem->name} ({$validated['quantity']}x)",
-            'type' => 'income_other',
+            'type' => 'income',
             'payment_method' => $validated['payment_method'],
         ]);
 

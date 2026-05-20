@@ -51,13 +51,11 @@ class ReportController extends Controller
         // Optimized query dengan selectRaw untuk aggregation
         $summary = Auth::user()->transactions()
             ->selectRaw('
-                SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as total_income,
+                SUM(CASE WHEN type IN ("income", "income_other") THEN amount ELSE 0 END) as total_income,
                 SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as total_expense
             ')
-            ->whereBetween('transaction_date', [
-                $validated['period_start'],
-                $validated['period_end']
-            ])
+            ->whereDate('transaction_date', '>=', $validated['period_start'])
+            ->whereDate('transaction_date', '<=', $validated['period_end'])
             ->first();
 
         $totalIncome = $summary->total_income ?? 0;
@@ -90,10 +88,8 @@ class ReportController extends Controller
             ->with(['transactionDetails' => function($query) {
                 $query->select('transaction_id', 'menu_name', 'quantity', 'total_price');
             }])
-            ->whereBetween('transaction_date', [
-                $report->period_start,
-                $report->period_end
-            ])
+            ->whereDate('transaction_date', '>=', $report->period_start)
+            ->whereDate('transaction_date', '<=', $report->period_end)
             ->get();
 
         $viewData = $this->buildReportData($report, $transactions);
@@ -150,10 +146,8 @@ class ReportController extends Controller
             ->with(['transactionDetails' => function($query) {
                 $query->select('transaction_id', 'menu_name', 'quantity', 'total_price');
             }])
-            ->whereBetween('transaction_date', [
-                $report->period_start,
-                $report->period_end
-            ])
+            ->whereDate('transaction_date', '>=', $report->period_start)
+            ->whereDate('transaction_date', '<=', $report->period_end)
             ->get();
 
         $viewData = $this->buildReportData($report, $transactions);
@@ -167,12 +161,12 @@ class ReportController extends Controller
 
     private function buildReportData(Report $report, $transactions)
     {
-        $totalIncome = $transactions->where('type', 'income')->sum('amount');
+        $totalIncome = $transactions->whereIn('type', ['income', 'income_other'])->sum('amount');
         $totalExpense = $transactions->where('type', 'expense')->sum('amount');
         $profit = $totalIncome - $totalExpense;
 
         $incomeDetails = collect();
-        $incomeTransactions = $transactions->where('type', 'income');
+        $incomeTransactions = $transactions->whereIn('type', ['income', 'income_other']);
         foreach ($incomeTransactions as $transaction) {
             foreach ($transaction->transactionDetails as $detail) {
                 $key = $detail->menu_name;

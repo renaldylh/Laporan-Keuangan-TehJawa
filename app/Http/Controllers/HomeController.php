@@ -45,13 +45,13 @@ class HomeController extends Controller
                     ->select('type', 'amount') // Hanya ambil kolom yang diperlukan
                     ->get();
 
-                $monthlyIncome = $monthlyTransactions->where('type', 'income')->sum('amount');
+                $monthlyIncome = $monthlyTransactions->whereIn('type', ['income', 'income_other'])->sum('amount');
                 $monthlyExpense = $monthlyTransactions->where('type', 'expense')->sum('amount');
                 $monthlyProfit = $monthlyIncome - $monthlyExpense;
 
                 // Optimasi dengan raw DB query untuk chart data
                 $chartData = DB::table('transactions')
-                    ->selectRaw('DATE(transaction_date) as date, type, SUM(amount) as total')
+                    ->selectRaw('DATE(transaction_date) as date, CASE WHEN type IN ("income", "income_other") THEN "income" ELSE type END as type, SUM(amount) as total')
                     ->where('user_id', auth()->id())
                     ->where('transaction_date', '>=', now()->subDays(30))
                     ->groupBy('date', 'type')

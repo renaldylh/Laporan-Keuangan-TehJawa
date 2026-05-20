@@ -27,7 +27,7 @@ class TransactionController extends Controller
                 // Optimasi query untuk summary dengan single query
                 $summary = auth()->user()->transactions()
                     ->selectRaw('
-                        SUM(CASE WHEN type = "income" THEN amount ELSE 0 END) as total_income,
+                        SUM(CASE WHEN type IN ("income", "income_other") THEN amount ELSE 0 END) as total_income,
                         SUM(CASE WHEN type = "expense" THEN amount ELSE 0 END) as total_expense
                     ')
                     ->first();
