@@ -91,8 +91,9 @@ class MenuController extends Controller
     /**
      * Display the specified menu item.
      */
-    public function show(Request $request, MenuItem $menuItem)
+    public function show(Request $request, MenuItem $menu)
     {
+        $menuItem = $menu;
         // Return JSON response for AJAX requests
         if ($request->expectsJson()) {
             return response()->json($menuItem);
@@ -104,24 +105,25 @@ class MenuController extends Controller
     /**
      * Show the form for editing the specified menu item.
      */
-    public function edit(MenuItem $menuItem)
+    public function edit(MenuItem $menu)
     {
         Gate::authorize('update-menu');
 
         $categories = MenuCategory::all();
 
+        $menuItem = $menu;
         return view('menu.edit', compact('menuItem', 'categories'));
     }
 
     /**
      * Update the specified menu item in database.
      */
-    public function update(Request $request, MenuItem $menuItem)
+    public function update(Request $request, MenuItem $menu)
     {
         Gate::authorize('update-menu');
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:menu_items,name,' . $menuItem->id,
+            'name' => 'required|string|max:255|unique:menu_items,name,' . $menu->id,
             'description' => 'nullable|string|max:500',
             'category' => 'required|' . MenuCategory::validationRule(),
             'price' => 'required|numeric|min:0',
@@ -135,14 +137,14 @@ class MenuController extends Controller
 
         // Handle image deletion
         if (isset($validated['delete_image']) && $validated['delete_image']) {
-            $menuItem->deleteImage();
+            $menu->deleteImage();
             $validated['image'] = null;
         }
 
         // Handle new image upload
         if ($request->hasFile('image')) {
             // Delete old image
-            $menuItem->deleteImage();
+            $menu->deleteImage();
             
             $imageFile = $request->file('image');
             $filename = time() . '_' . $imageFile->getClientOriginalName();
@@ -150,8 +152,9 @@ class MenuController extends Controller
             $validated['image'] = $filename;
         }
 
-        $menuItem->update($validated);
+        $menu->update($validated);
 
+        $menuItem = $menu;
         // Return JSON response for AJAX requests
         if ($request->expectsJson()) {
             return response()->json([
@@ -168,14 +171,14 @@ class MenuController extends Controller
     /**
      * Remove the specified menu item from database.
      */
-    public function destroy(MenuItem $menuItem, Request $request)
+    public function destroy(MenuItem $menu, Request $request)
     {
         Gate::authorize('delete-menu');
 
         // Delete associated image
-        $menuItem->deleteImage();
+        $menu->deleteImage();
 
-        $menuItem->delete();
+        $menu->delete();
 
         // Return JSON response for AJAX requests
         if ($request->expectsJson()) {
