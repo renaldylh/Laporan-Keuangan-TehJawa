@@ -36,8 +36,8 @@ class HomeController extends Controller
                     ->take(5)
                     ->get();
 
-                $currentMonthStart = now()->startOfMonth();
-                $currentMonthEnd = now()->endOfMonth();
+                $currentMonthStart = now()->startOfMonth()->format('Y-m-d');
+                $currentMonthEnd = now()->endOfMonth()->format('Y-m-d');
 
                 // Optimasi query untuk monthly data
                 $monthlyTransactions = auth()->user()->transactions()

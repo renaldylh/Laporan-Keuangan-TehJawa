@@ -25,6 +25,27 @@ class Transaction extends Model
         'amount' => 'decimal:2',
     ];
 
+    protected static function booted()
+    {
+        $clearCache = function ($transaction) {
+            $userId = $transaction->user_id;
+            if ($userId) {
+                // Clear transaction list cache for pages 1 to 5
+                for ($page = 1; $page <= 5; $page++) {
+                    foreach (['all', 'income', 'expense'] as $type) {
+                        cache()->forget("transactions_{$userId}_{$page}_{$type}");
+                    }
+                }
+                // Clear dashboard cache
+                cache()->forget('dashboard_' . $userId . '_' . now()->format('Y-m-d_H'));
+            }
+        };
+
+        static::created($clearCache);
+        static::updated($clearCache);
+        static::deleted($clearCache);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
